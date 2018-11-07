@@ -1,9 +1,9 @@
 % Code by professor João Paulo Costeira - jpcosteira@tecnico.ulisboa.pt
-function remove_bg(show)
+function remove_bg(mode)
 
-    if ( ~strcmp(show, 'grey') && ~strcmp(show, 'depth') )
-        print("Show must be either 'grey' or 'depth'");
-        exit(1);
+    if ( ~strcmp(mode, 'grey') && ~strcmp(mode, 'depth') )
+        disp("Show must be either 'grey' or 'depth'");
+        return;
     end
     
     d = dir('../img/remove_bg/*.jpg'); % 480x640 rgb images
@@ -40,12 +40,12 @@ function remove_bg(show)
     figure(1); clf;
     figure(2); clf;
     
-    if(strcmp(show, 'grey'))
+    if(strcmp(mode, 'grey'))
        img = imgs;
        bg = bggray;
        diff_threshold = 0.2;
        filter_size = 5;
-    elseif( strcmp(show, 'depth') )
+    elseif( strcmp(mode, 'depth') )
        img = imgsd;
        bg = bgdepth;
        diff_threshold = 0.20;
