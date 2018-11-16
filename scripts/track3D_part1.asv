@@ -1,0 +1,17 @@
+function [ objects ] = track3D_part1( imgseq1, cam_params )
+%The function receives the images as inputs and  returns the 8 points describing the time trajectories 
+%of the enclosing box of the objects in world (camera) coordinates
+% imgseq1:
+%  Array of structures with the name of the files for the RGB and DEPTH images.
+%  Each element has the following fields
+
+%  imgseq1(i).rgb - the file name of rgb image i
+%  imgseq1(i).depth - the file name of depth image i
+
+%  RGB images are jpg or png (opened with imread() and depth files are matlab files that must be loaded. The depth image is in the depth_array variable (like you did in the lab)
+
+% 
+
+
+end
+

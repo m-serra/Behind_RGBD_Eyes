@@ -7,3 +7,5 @@ The cameras are in a fixed position and the scene is composed of a static set of
 
 Link for Professor João Paulo Costeira's (jpcosteira@tecnico.ulisboa.pt) auxiliary code:
 http://printart.isr.ist.utl.pt/piv/project/auxcode/
+
+Note: Insert the datasets in the datasets folder
