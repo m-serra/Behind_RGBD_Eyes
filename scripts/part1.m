@@ -1,6 +1,6 @@
 %% Data Preprocessing
 
-datasetlocation = '../Datasets/movingpeople/maizena_chocapics1/data_rgb/';
+datasetlocation = '../datasets/movingpeople/maizena_chocapics1/data_rgb/';
 cameralocation = '../vars/cameraparametersAsus.mat';
 
 % Get the list of images names
@@ -22,22 +22,20 @@ depth_sorted = natsortfiles({depth_images.name});
 %clear 'rgb_images' 'depth_images';
 
 % preallocation of memory
-imagesequence = struct('rgb', cell(1, 22), 'depth', cell(1, 22));
+imagesequence = struct('rgb', cell(1, length(depth_images)), 'depth', cell(1, length(depth_images)));
+%imagesequence = struct('rgb', strings(1, length(depth_images)), 'depth', strings(1, length(depth_images)));
 
 for i = 1:length(rgb_sorted)    
-    imagesequence(i).rgb = rgb_sorted(i);
-    imagesequence(i).depth = depth_sorted(i);
+    imagesequence(i).rgb = strcat(datasetlocation,rgb_sorted(i));
+    imagesequence(i).depth = strcat(datasetlocation, depth_sorted(i));
 end
 
 % Get the camera parameters
 cameramatrix = load(cameralocation);
+[rgbseq, dseq] = load_images(imagesequence);
+pc = get_point_cloud(dseq(1), cameramatrix.cam_params);
 
 %% Part I
-
-
-
-
-
 
 
 % Calling the function of PART1
