@@ -7,6 +7,9 @@ function [ rgbseq, dseq ] = load_images( imgseq )
 
     for i = 1:seq_size % iterate all images
         % load rgb
+        % if nedded, convert string to character vector
+        % img_rgb_i = convertStringsToChars(imgseq(i).rgb)  
+        % img_d_i = convertStringsToChars(imgseq(i).depth)
         rgbseq(:,:,i) = imread(imgseq(i).rgb);
         % load depth 
         load(imgseq(i).depth);

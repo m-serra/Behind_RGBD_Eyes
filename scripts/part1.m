@@ -1,4 +1,4 @@
-%% Data Preprocessing
+ %% Data Preprocessing
 
 datasetlocation = '../datasets/movingpeople/maizena_chocapics1/data_rgb/';
 cameralocation = '../vars/cameraparametersAsus.mat';
@@ -22,12 +22,12 @@ depth_sorted = natsortfiles({depth_images.name});
 %clear 'rgb_images' 'depth_images';
 
 % preallocation of memory
-imagesequence = struct('rgb', cell(1, length(depth_images)), 'depth', cell(1, length(depth_images)));
-%imagesequence = struct('rgb', strings(1, length(depth_images)), 'depth', strings(1, length(depth_images)));
+% imagesequence = struct('rgb', cell(1, length(depth_images)), 'depth', cell(1, length(depth_images)));
+imagesequence = struct('rgb', strings(1, length(depth_images)), 'depth', strings(1, length(depth_images)));
 
 for i = 1:length(rgb_sorted)    
-    imagesequence(i).rgb = strcat(datasetlocation,rgb_sorted(i));
-    imagesequence(i).depth = strcat(datasetlocation, depth_sorted(i));
+    imagesequence(i).rgb = string(strcat(datasetlocation,rgb_sorted(i)));
+    imagesequence(i).depth = string(strcat(datasetlocation, depth_sorted(i)));
 end
 
 % Get the camera parameters
