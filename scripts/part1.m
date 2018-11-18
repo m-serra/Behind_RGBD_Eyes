@@ -1,6 +1,6 @@
  %% Data Preprocessing
 
-datasetlocation = '../datasets/movingpeople/maizena_chocapics1/data_rgb/';
+datasetlocation = '../datasets/corredor1/';
 cameralocation = '../vars/cameraparametersAsus.mat';
 
 % Get the list of images names
@@ -23,7 +23,7 @@ depth_sorted = natsortfiles({depth_images.name});
 
 % preallocation of memory
 % imagesequence = struct('rgb', cell(1, length(depth_images)), 'depth', cell(1, length(depth_images)));
-imagesequence = struct('rgb', strings(1, length(depth_images)), 'depth', strings(1, length(depth_images)));
+imagesequence = struct('rgb', convertStringsToChars(strings(1, length(depth_images))), 'depth', convertStringsToChars(strings(1, length(depth_images))));
 
 for i = 1:length(rgb_sorted)    
     imagesequence(i).rgb = string(strcat(datasetlocation,rgb_sorted(i)));
