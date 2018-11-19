@@ -1,6 +1,6 @@
 %% Data Preprocessing
 
-datasetlocation = '../Datasets/movingpeople/maizena_chocapics1/data_rgb/';
+datasetlocation = '../datasets/movingpeople/maizena_chocapics1/data_rgb/';
 cameralocation = '../vars/cameraparametersAsus.mat';
 
 % Get the list of images names
@@ -22,26 +22,29 @@ depth_sorted = natsortfiles({depth_images.name});
 %clear 'rgb_images' 'depth_images';
 
 % preallocation of memory
-imagesequence = struct('rgb', cell(1, 22), 'depth', cell(1, 22));
+%imagesequence = struct('rgb', cell(1, 22), 'depth', cell(1, 22));
 
 for i = 1:length(rgb_sorted)    
-    imagesequence(i).rgb = rgb_sorted(i);
-    imagesequence(i).depth = depth_sorted(i);
+    imagesequence(i).rgb = [datasetlocation rgb_images(i)];
+    imagesequence(i).depth = [datasetlocation depth_sorted(i)];
 end
+
+
 
 % Get the camera parameters
 cameramatrix = load(cameralocation);
 
+
+str = string(imagesequence(1).rgb{1})
+isstring(str)
+
+
 %% Part I
 
 
-
-
-
-
-
 % Calling the function of PART1
-%objects = track3D_part1(imagesequence, cameramatrix.cam_params);
+objects = track3D_part1(imagesequence, cameramatrix.cam_params);
 
 
 %% Part II
+
