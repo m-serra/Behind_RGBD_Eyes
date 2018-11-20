@@ -52,38 +52,45 @@ background = get_background(dseq);
 % --- Start working with components ---
 
 % cell array that contains COMPONENTS FOR ALL FRAMES
-components = cell(1, size(dseq,3));
+components = [];
 
-% get components for a given frame
+% parameters
 diff_threshold = 0.20;
 filter_size = 5;
-cc = get_components(background, dseq(:,:,1), diff_threshold, filter_size);
 
-if cc.NumObjects > 0
-    frame_components = struct('label',cell(1,cc.NumObjects), ...
-                               'indices',cell(1,cc.NumObjects), ...
-                               'descriptor',cell(1,cc.NumObjects), ...
-                               'X',cell(1,cc.NumObjects), ...
-                               'Y',cell(1,cc.NumObjects), ... 
-                               'Z',cell(1,cc.NumObjects), ...
-                               'frames',cell(1,cc.NumObjects));
-    for i = 1:cc.NumObjects
-        frame_components(i).label = i;
-        frame_components(i).indices = cc.PixelIdxList{i};
-        frame_components(i).descriptor = 0;
-        frame_components(i).X = zeros(8);
-        frame_components(i).Y = zeros(8);
-        frame_components(i).Z = zeros(8);
-        % this will be inside a loop with frame iterator
-        % frame_components(i).frames = frame
+% iterate over frames:
+for frame=1:2%size(dseq,3)
+    % get components for a given frame
+    cc = get_components(background, dseq(:,:,frame), diff_threshold, ...
+                        filter_size);
+                    
+    % if at least one component was identified, then store info
+    if cc.NumObjects > 0
+        frame_components = struct( 'frame',cell(1,cc.NumObjects), ...
+                                   'label',cell(1,cc.NumObjects), ...
+                                   'indices',cell(1,cc.NumObjects), ...
+                                   'descriptor',cell(1,cc.NumObjects), ...
+                                   'X',cell(1,cc.NumObjects), ...
+                                   'Y',cell(1,cc.NumObjects), ... 
+                                   'Z',cell(1,cc.NumObjects));
+                               
+        % for each component identified, store its info                       
+        for i = 1:cc.NumObjects
+            frame_components(i).frame = frame;
+            frame_components(i).label = i;
+            frame_components(i).indices = cc.PixelIdxList{i};
+            frame_components(i).descriptor = 0;
+            frame_components(i).X = zeros(8);
+            frame_components(i).Y = zeros(8);
+            frame_components(i).Z = zeros(8);
+        end
+    else
+        frame_components = 0;
     end
-else
-    frame_components = 0;
+
+    % this will be inside a loop with frame iterator
+    components = [components frame_components];
 end
-
-% this will be inside a loop with frame iterator
-components(1)=frame_components;
-
 
 
 % Calling the function of PART1
