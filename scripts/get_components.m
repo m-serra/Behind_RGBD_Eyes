@@ -29,9 +29,9 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
 %     title('Depth image i and background image');
 %     
 %     Differemt components are assgined different colors
-%     figure(3);
-%     imagesc(bwlabel(imgdiffiltered));
-%     title('Connected components');
+     figure(5);
+     imagesc(bwlabel(imgdiffiltered));
+     title('Connected components');
 
 end
 
