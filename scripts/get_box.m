@@ -9,6 +9,12 @@ size_dimg = size(dimg);
 pc = get_point_cloud(dimg(indices),size_dimg,indices',cam_params);
 
 % Get coordinates for 8 points in the order:
+% x_max = max(pc.Location(:,1));
+% x_min = min(pc.Location(:,1));
+% y_max = max(pc.Location(:,2));
+% y_min = min(pc.Location(:,2));
+% z_max = max(pc.Location(:,3));
+% z_min = min(pc.Location(:,3));
 
 X = [pc.XLimits(1); pc.XLimits(2); pc.XLimits(2); pc.XLimits(1); ...
      pc.XLimits(1); pc.XLimits(2); pc.XLimits(2); pc.XLimits(1)];
@@ -19,16 +25,16 @@ Y = [pc.YLimits(1); pc.YLimits(1); pc.YLimits(2); pc.YLimits(2); ...
 Z = [pc.ZLimits(1); pc.ZLimits(1); pc.ZLimits(1); pc.ZLimits(1); ...
      pc.ZLimits(2); pc.ZLimits(2); pc.ZLimits(2); pc.ZLimits(2)];
  
-% example of unit cube plotting 
- xt = [0;1;1;0;0];
- yt = [0;0;1;1;0];
- zt = [0;0;0;0;0];
- figure;
- hold on;
- plot3(xt,yt,zt);   % draw a square in the xy plane with z = 0
- plot3(xt,yt,zt+1); % draw a square in the xy plane with z = 1
- set(gca,'View',[-28,35]); % set the azimuth and elevation of the plot
 
+figure(10);
+showPointCloud(pc);
+hold on
+edges = [pc.XLimits(2) - pc.XLimits(1), pc.YLimits(2) - pc.YLimits(1),...
+         pc.ZLimits(2) - pc.ZLimits(1)]; % size of each edge
+origin = [pc.XLimits(1), pc.YLimits(1), pc.ZLimits(1)]; % defined as the point from which the cube wll be drawn
+transparency = 0.1;
+plot_box(edges, origin, transparency)
+hold off 
 
 end
 

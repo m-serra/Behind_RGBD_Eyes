@@ -14,6 +14,6 @@ function [ point_cloud ] = get_point_cloud( dimg, size_dimg, indices, ...
     pc_points = Kd\miu_depth;
     
     point_cloud = pointCloud(pc_points');
-    figure(1);showPointCloud(point_cloud);
+
 end
 
