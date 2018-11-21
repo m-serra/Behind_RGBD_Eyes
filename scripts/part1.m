@@ -43,7 +43,9 @@ imagesequence = load('../vars/imagesequence_corredor1.mat');
 imagesc(uint8(dseq(:,:,1)));
 
 % Point cloud
-pc = get_point_cloud(dseq(:,:,1), cameramatrix.cam_params);
+size_dimg = size(dseq(:,:,1));
+pc = get_point_cloud(dseq(:,:,1), size_dimg, ...
+                    (1:size_dimg(1)*size_dimg(2)),cameramatrix.cam_params);
 
 % Subtract background
 background = get_background(dseq);
@@ -80,9 +82,12 @@ for frame=1:2%size(dseq,3)
             frame_components(i).label = i;
             frame_components(i).indices = cc.PixelIdxList{i};
             frame_components(i).descriptor = 0;
-            frame_components(i).X = zeros(8);
-            frame_components(i).Y = zeros(8);
-            frame_components(i).Z = zeros(8);
+            % get box coordinates
+            [X, Y, Z] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
+                                cameramatrix.cam_params);
+            frame_components(i).X = X;
+            frame_components(i).Y = Y;
+            frame_components(i).Z = Z;
         end
     else
         frame_components = 0;
