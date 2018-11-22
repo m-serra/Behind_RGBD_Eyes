@@ -5,8 +5,8 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
 %   2- Applies a morphological filter to clean some noise
 %   3. Labels the identified components
 %   4. Returns connected components
-    figure(1);clf;
-    figure(2);clf;
+    %figure(1);clf;
+    %figure(2);clf;
    
     % Image without background
     imdiff=abs(img-background)>diff_threshold;
@@ -16,6 +16,12 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
     
     % Gets connected components info
     cc = bwconncomp(imgdiffiltered);
+    
+    figure (21)
+    imshow(imgdiffiltered);
+    figure (22)
+    imshow(imdiff);
+    
     
 %     Looks for connected components and filter
 %     figure(1);
@@ -34,4 +40,3 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
      title('Connected components');
 
 end
-

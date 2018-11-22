@@ -38,6 +38,7 @@ cameramatrix = load(cameralocation);
 % Manually load imagesequence
 imagesequence = load('../vars/imagesequence_corredor1.mat');
 
+figure (1)
 % Load images
 [rgbseq, grayseq, dseq] = load_images(imagesequence.imagesequence);
 imagesc(uint8(dseq(:,:,1)));
@@ -46,10 +47,9 @@ imagesc(uint8(dseq(:,:,1)));
 size_dimg = size(dseq(:,:,1));
 pc = get_point_cloud(dseq(:,:,1), size_dimg, ...
                     (1:size_dimg(1)*size_dimg(2)),cameramatrix.cam_params);
-
+figure (2)
 % Subtract background
-background = get_background(dseq);
-
+background = get_background(grayseq);
 
 % --- Start working with components ---
 
@@ -57,16 +57,16 @@ background = get_background(dseq);
 components = [];
 
 % parameters
-diff_threshold = 0.20;
-filter_size = 10;
+diff_threshold = 10;
+filter_size = 7;
 
 % iterate over frames:
 for frame=1:1%size(dseq,3)
     % get components for a given frame
-    cc = get_components(background, dseq(:,:,frame), diff_threshold, ...
+    cc = get_components(background, grayseq(:,:,frame), diff_threshold, ...
                         filter_size);
                     
-    % if at least one component was identified, then store info
+    %if at least one component was identified, then store info
     if cc.NumObjects > 0
         frame_components = struct( 'frame',cell(1,cc.NumObjects), ...
                                    'label',cell(1,cc.NumObjects), ...
@@ -76,14 +76,14 @@ for frame=1:1%size(dseq,3)
                                    'Y',cell(1,cc.NumObjects), ... 
                                    'Z',cell(1,cc.NumObjects));
                                
-        % for each component identified, store its info                       
+        %for each component identified, store its info                       
         for i = 1:cc.NumObjects
             frame_components(i).frame = frame;
             frame_components(i).label = i;
             frame_components(i).indices = cc.PixelIdxList{i};
             frame_components(i).descriptor = 0;
-            % get box coordinates
-            [X, Y, Z] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
+            %get box coordinates
+            [X, Y, Z, pc2] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
                                 cameramatrix.cam_params);
             frame_components(i).X = X;
             frame_components(i).Y = Y;
@@ -93,7 +93,7 @@ for frame=1:1%size(dseq,3)
         frame_components = 0;
     end
 
-    % this will be inside a loop with frame iterator
+    %this will be inside a loop with frame iterator
     components = [components frame_components];
 end
 

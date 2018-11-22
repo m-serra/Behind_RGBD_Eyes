@@ -4,7 +4,7 @@ function [ background ] = get_background( seq )
 %   Receives as argument a image sequence, and calculates the median over
 %   time to get the background
     background=median(seq,3);
-    imagesc(background);
-
+    %imagesc(uint8(background));
+    imshow(uint8(background));
 end
 
