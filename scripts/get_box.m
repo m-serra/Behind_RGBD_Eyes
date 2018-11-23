@@ -42,7 +42,7 @@ line([X(2) X(2)],[Y(1) Y(2)],[Z(2) Z(2)]);hold on;
 line([X(1) X(1)],[Y(1) Y(1)],[Z(1) Z(2)]);hold on;
 line([X(1) X(1)],[Y(2) Y(2)],[Z(1) Z(2)]);hold on;
 line([X(2) X(2)],[Y(1) Y(1)],[Z(1) Z(2)]);hold on;
-line([X(2) X(2)],[Y(2) Y(2)],[Z(1) Z(2)]);hold on;
+line([X(2) X(2)],[Y(2) Y(2)],[Z(1) Z(2)]);
 
 % edges = [pc.XLimits(2) - pc.XLimits(1), pc.YLimits(2) - pc.YLimits(1),...
 %          pc.ZLimits(2) - pc.ZLimits(1)]; % size of each edge

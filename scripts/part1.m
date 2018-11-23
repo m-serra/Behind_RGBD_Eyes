@@ -1,6 +1,6 @@
  %% Data Preprocessing
 
-datasetlocation = '../datasets/corredor1/';
+datasetlocation = '../datasets/lab1/';
 cameralocation = '../vars/cameraparametersAsus.mat';
 
 %% CREATE image sequence
@@ -30,13 +30,19 @@ cameralocation = '../vars/cameraparametersAsus.mat';
 %     imagesequence(i).depth = string(strcat(datasetlocation, depth_sorted(i)));
 % end
 
+%% CHANGE CORREDOR1 TO ANY DATASET
+% for i=1:254*2
+%     imagesequence(i).rgb = strrep(imagesequence(i).rgb,"corredor1","lab1");
+%     imagesequence(i).depth = strrep(imagesequence(i).depth,"corredor1","lab1");
+% end
+
 %% Part I
 
 % Get the camera parameters
 cameramatrix = load(cameralocation);
 
 % Manually load imagesequence
-imagesequence = load('../vars/imagesequence_corredor1.mat');
+imagesequence = load('../vars/imagesequence_lab1.mat');
 
 figure (1)
 % Load images
@@ -49,7 +55,7 @@ pc = get_point_cloud(dseq(:,:,1), size_dimg, ...
                     (1:size_dimg(1)*size_dimg(2)),cameramatrix.cam_params);
 figure (2)
 % Subtract background
-background = get_background(grayseq);
+background = get_background(dseq);
 
 % --- Start working with components ---
 
@@ -57,13 +63,13 @@ background = get_background(grayseq);
 components = [];
 
 % parameters
-diff_threshold = 10;
-filter_size = 7;
+diff_threshold = 0.2;
+filter_size = 10;
 
 % iterate over frames:
 for frame=1:1%size(dseq,3)
     % get components for a given frame
-    cc = get_components(background, grayseq(:,:,frame), diff_threshold, ...
+    cc = get_components(background, dseq(:,:,frame), diff_threshold, ...
                         filter_size);
                     
     %if at least one component was identified, then store info
@@ -81,7 +87,8 @@ for frame=1:1%size(dseq,3)
             frame_components(i).frame = frame;
             frame_components(i).label = i;
             frame_components(i).indices = cc.PixelIdxList{i};
-            frame_components(i).descriptor = 0;
+            frame_components(i).descriptor = get_component_descriptor(dseq(:,:,frame), ...
+                rgbseq(:,:,:,frame), cc.PixelIdxList{i}, cameramatrix.cam_params);
             %get box coordinates
             [X, Y, Z, pc2] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
                                 cameramatrix.cam_params);

@@ -7,7 +7,7 @@ function [ rgbseq, grayseq, dseq ] = load_images( imgseq)
     
     % ATTENTION MUST CHANGE
     %seq_size = length(imgseq);
-    seq_size = 254;
+    seq_size = 20;
     rgbseq = zeros(480, 640, 3, seq_size); % array of cubes to put all rgb images
     grayseq = zeros(480, 640, seq_size); % cube to put all gray images
     dseq = zeros(480, 640, seq_size); % cube to put all depth images
@@ -20,7 +20,6 @@ function [ rgbseq, grayseq, dseq ] = load_images( imgseq)
         % load depth 
         load(char(imgseq(i).depth));
         dseq(:,:,i) = double(depth_array)/1000;
-        
 
         % plot the images
 %         figure(1);
@@ -30,7 +29,10 @@ function [ rgbseq, grayseq, dseq ] = load_images( imgseq)
 %         colormap(gray);
 %     
 %         pause(0.1);
+    
+        % test to remove zeros in depth
+        %dseq(:,:,i) = correct_depth(dseq(:,:,i));
     end
-
+    
+    
 end
-
