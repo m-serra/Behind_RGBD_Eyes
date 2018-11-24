@@ -102,7 +102,7 @@ for frame=15:16%size(dseq,3)
     end
     C = match_components(frame_components_old, frame_components_new);
     %this will be inside a loop with frame iterator
-    objects = [objects new_objects];
+    %objects = [objects new_objects];
     
 end
 
