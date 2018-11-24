@@ -82,8 +82,8 @@ for frame=1:1%size(dseq,3)
             frame_components(i).descriptor = get_component_descriptor(dseq(:,:,frame), ...
                 rgbseq(:,:,:,frame), cc.PixelIdxList{i}, cameramatrix.cam_params);
             %get box coordinates
-            [X, Y, Z, pc2] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
-                                cameramatrix.cam_params);
+            [X, Y, Z] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
+                                cameramatrix.cam_params, i);
             frame_components(i).X = X;
             frame_components(i).Y = Y;
             frame_components(i).Z = Z;

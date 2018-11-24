@@ -31,7 +31,7 @@ function [ rgbseq, grayseq, dseq ] = load_images( imgseq)
 %         pause(0.1);
     
         % test to remove zeros in depth
-        %dseq(:,:,i) = correct_depth(dseq(:,:,i));
+        dseq(:,:,i) = correct_depth(dseq(:,:,i));
     end
     
     
