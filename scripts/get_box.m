@@ -1,4 +1,4 @@
-function [ X, Y, Z] = get_box( dimg, indices, cam_params, i )
+function [ X, Y, Z] = get_box( dimg, indices, cam_params, i)
 %GET_BOX Function to obtain the coordinates of the box containing a
 %component
 %   This function receives as argument the indices of a component. It

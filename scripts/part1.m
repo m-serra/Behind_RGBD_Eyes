@@ -60,21 +60,21 @@ background = get_background(dseq);
 % --- Start working with components ---
 
 % cell array that contains COMPONENTS FOR ALL FRAMES
-components = [];
+objects = [];
 
 % parameters
 diff_threshold = 0.2;
 filter_size = 10;
 
 % iterate over frames:
-for frame=1:1%size(dseq,3)
+for frame=15:16%size(dseq,3)
     % get components for a given frame
     cc = get_components(background, dseq(:,:,frame), diff_threshold, ...
                         filter_size);
                     
     %if at least one component was identified, then store info
     if cc.NumObjects > 0
-        frame_components = struct( 'frame',cell(1,cc.NumObjects), ...
+        frame_components_new = struct( 'frame',cell(1,cc.NumObjects), ...
                                    'label',cell(1,cc.NumObjects), ...
                                    'indices',cell(1,cc.NumObjects), ...
                                    'descriptor',cell(1,cc.NumObjects), ...
@@ -84,24 +84,34 @@ for frame=1:1%size(dseq,3)
                                
         %for each component identified, store its info                       
         for i = 1:cc.NumObjects
-            frame_components(i).frame = frame;
-            frame_components(i).label = i;
-            frame_components(i).indices = cc.PixelIdxList{i};
-            frame_components(i).descriptor = get_component_descriptor(dseq(:,:,frame), ...
+            frame_components_new(i).frame = frame;
+            frame_components_new(i).label = i;
+            frame_components_new(i).indices = cc.PixelIdxList{i};
+            frame_components_new(i).descriptor = get_component_descriptor(dseq(:,:,frame), ...
                 rgbseq(:,:,:,frame), cc.PixelIdxList{i}, cameramatrix.cam_params);
             %get box coordinates
             [X, Y, Z] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
                                 cameramatrix.cam_params, i);
-            frame_components(i).X = X;
-            frame_components(i).Y = Y;
-            frame_components(i).Z = Z;
+            frame_components_new(i).X = X;
+            frame_components_new(i).Y = Y;
+            frame_components_new(i).Z = Z;
         end
+        
     else
         frame_components = 0;
     end
-
+    
+    
+    % compare frame_components's components
+    % with previous frame components
+    if frame == 15
+        frame_components_old=frame_components_new;
+        continue
+    end
+    C = match_components(frame_components_old, frame_components_new);
     %this will be inside a loop with frame iterator
-    components = [components frame_components];
+    objects = [objects new_objects];
+    
 end
 
 
