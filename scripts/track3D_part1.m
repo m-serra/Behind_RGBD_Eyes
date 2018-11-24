@@ -1,6 +1,36 @@
 function [ objects ] = track3D_part1( imgseq1, cam_params )
 %The function receives the images as inputs and  returns the 8 points describing the time trajectories 
 %of the enclosing box of the objects in world (camera) coordinates
+
+imgs_rgb = zeros(480, 640, length(imgseq1)); % cube to put all rgb images converted to grayscale
+imgs_depth = zeros(480, 640, length(imgseq1)); % cube to put all depth images
+
+for i = 1:length(imgseq1)
+   isstring(imgseq1(i).rgb);
+   s = strcat('../datasets/movingpeople/maizena_chocapics1/', imgseq1(i).rgb);
+   isstring(s);
+end
+
+
+
+    for i = 1:length(imgseq1) % iterate all images
+        imgs_rgb(:,:,i) = rgb2gray(imread(strcat('../datasets/movingpeople/maizena_chocapics1/', imgseq1(i).rgb)));
+        depth_array = load(strcat('../datasets/movingpeople/maizena_chocapics1/', imgseq1(i).depth));
+        imgs_depth(:,:,i) = double(depth_array)/1000;
+
+        % plot the images
+        figure(1);dg
+        subplot(211); imshow(uint8(imgs_rgb(:,:,i)));
+        subplot(212); imagesc(imgs_depth(:,:,i));
+        colormap(gray);
+
+        pause(0.1);
+    end
+
+
+
+end
+
 % imgseq1:
 %  Array of structures with the name of the files for the RGB and DEPTH images.
 %  Each element has the following fields
@@ -38,8 +68,3 @@ objects(i).frames_tracked
     same as the number of rows of objects(i).X . For example,  objects(i).X(3,:) are the 8 X coordinates of 
     the box of object i,  detectedin  image  number objects(i).frames_tracked(3) 
 %}
-
-
-
-end
-

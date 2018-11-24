@@ -5,6 +5,9 @@ The goal of the project is the detection, localization and tracking of moving ob
 
 The cameras are in a fixed position and the scene is composed of a static set of objects (background) and a variable number of moving objects. 
 
+Link for the project definition:
+http://printart.isr.ist.utl.pt/piv/project/
+
 Link for Professor João Paulo Costeira's (jpcosteira@tecnico.ulisboa.pt) auxiliary code:
 http://printart.isr.ist.utl.pt/piv/project/auxcode/
 

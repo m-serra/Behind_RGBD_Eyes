@@ -9,8 +9,11 @@ function [ point_cloud ] = get_point_cloud( dimg, size_dimg, indices, ...
     else
         Z = dimg';
     end
+    
     [y, x] = ind2sub(size_dimg,indices);
+    
     miu_depth = [Z.*x ;Z.*y;Z];
+    
     pc_points = Kd\miu_depth;
     
     point_cloud = pointCloud(pc_points');

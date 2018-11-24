@@ -1,52 +1,44 @@
  %% Data Preprocessing
 
 datasetlocation = '../datasets/lab1/';
+
 cameralocation = '../vars/cameraparametersAsus.mat';
 
-%% CREATE image sequence
-% % Get the list of images names
-% rgb_images = dir(strcat(datasetlocation, '*.png'));
-% depth_images = dir(strcat(datasetlocation, '*.mat'));
-% 
-% % Check for datasets with errors
-% if(length(rgb_images) ~= length(depth_images))
-%        fprintf('The number of rgb images is diffent from the depth images\n');
-% end
-% 
-% % transform the list images names into an array of structures
-% 
-% % sorting the files names through their natural order
+% CREATE image sequence
+% Get the list of images names
+rgb_images = dir(strcat(datasetlocation, '*.png'));
+depth_images = dir(strcat(datasetlocation, '*.mat'));
+
+% Check for datasets with errors
+if(length(rgb_images) ~= length(depth_images))
+       fprintf('The number of rgb images is diffent from the depth images\n');
+end
+
+% transform the list images names into an array of structures
+
+% sorting the files names through their natural order
 % rgb_sorted = natsortfiles({rgb_images.name});
 % depth_sorted = natsortfiles({depth_images.name});
-% 
-% %tidying up the place
-% %clear 'rgb_images' 'depth_images';
-% 
-% % preallocation of memory
-% imagesequence = struct('rgb', convertStringsToChars(strings(1, length(depth_images))), 'depth', convertStringsToChars(strings(1, length(depth_images))));
-% 
-% for i = 1:length(rgb_sorted)    
-%     imagesequence(i).rgb = string(strcat(datasetlocation,rgb_sorted(i)));
-%     imagesequence(i).depth = string(strcat(datasetlocation, depth_sorted(i)));
-% end
 
-% %% CHANGE CORREDOR1 TO ANY DATASET
-% for i=1:254*2
-%     imagesequence(i).rgb = strrep(imagesequence(i).rgb,"corredor1","fruta1");
-%     imagesequence(i).depth = strrep(imagesequence(i).depth,"corredor1","fruta1");
-% end
+%tidying up the place
+%clear 'rgb_images' 'depth_images';
+
+% preallocation of memory
+imagesequence = struct('rgb', cell(1, length(depth_images)), 'depth', cell(1, length(depth_images)));
+
+for i = 1:length(depth_images)
+    imagesequence(i).rgb =[datasetlocation rgb_images(i).name];
+    imagesequence(i).depth =[datasetlocation depth_images(i).name];
+end
 
 %% Part I
 
 % Get the camera parameters
 cameramatrix = load(cameralocation);
 
-% Manually load imagesequence
-imagesequence = load('../vars/imagesequence_lab1.mat');
-
 figure (1)
 % Load images
-[rgbseq, grayseq, dseq] = load_images(imagesequence.imagesequence);
+[rgbseq, grayseq, dseq] = load_images(imagesequence);
 imagesc(uint8(dseq(:,:,1)));
 
 % Point cloud
@@ -116,6 +108,7 @@ end
 
 
 % Calling the function of PART1
-%objects = track3D_part1(imagesequence, cameramatrix.cam_params);
+% objects = track3D_part1(imagesequence, cameramatrix.cam_params);
 
 %% Part II
+
