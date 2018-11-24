@@ -38,5 +38,5 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
      figure(5);
      imagesc(bwlabel(imgdiffiltered));
      title('Connected components');
-
+     
 end
