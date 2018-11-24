@@ -30,10 +30,10 @@ cameralocation = '../vars/cameraparametersAsus.mat';
 %     imagesequence(i).depth = string(strcat(datasetlocation, depth_sorted(i)));
 % end
 
-%% CHANGE CORREDOR1 TO ANY DATASET
+% %% CHANGE CORREDOR1 TO ANY DATASET
 % for i=1:254*2
-%     imagesequence(i).rgb = strrep(imagesequence(i).rgb,"corredor1","lab1");
-%     imagesequence(i).depth = strrep(imagesequence(i).depth,"corredor1","lab1");
+%     imagesequence(i).rgb = strrep(imagesequence(i).rgb,"corredor1","fruta1");
+%     imagesequence(i).depth = strrep(imagesequence(i).depth,"corredor1","fruta1");
 % end
 
 %% Part I
@@ -90,8 +90,8 @@ for frame=1:1%size(dseq,3)
             frame_components(i).descriptor = get_component_descriptor(dseq(:,:,frame), ...
                 rgbseq(:,:,:,frame), cc.PixelIdxList{i}, cameramatrix.cam_params);
             %get box coordinates
-            [X, Y, Z, pc2] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
-                                cameramatrix.cam_params);
+            [X, Y, Z] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
+                                cameramatrix.cam_params, i);
             frame_components(i).X = X;
             frame_components(i).Y = Y;
             frame_components(i).Z = Z;
