@@ -55,7 +55,7 @@ background = get_background(dseq);
 objects = [];
 
 % parameters
-diff_threshold = 0.2
+diff_threshold = 0.2;
 filter_size = 10;
 
 % iterate over frames:
@@ -90,19 +90,30 @@ for frame=1:5%size(dseq,3)
         end
         
     else
-        frame_components = 0;
+        frame_components_new = struct( 'frame',cell(1,cc.NumObjects), ...
+                                   'label',cell(1,cc.NumObjects), ...
+                                   'indices',cell(1,cc.NumObjects), ...
+                                   'descriptor',cell(1,cc.NumObjects), ...
+                                   'X',cell(1,cc.NumObjects), ...
+                                   'Y',cell(1,cc.NumObjects), ... 
+                                   'Z',cell(1,cc.NumObjects));
     end
     
     
     % compare frame_components's components
     % with previous frame components
-%     if frame == 1
-%         frame_components_old=frame_components_new;
-%         continue
-%     end
-%     C = match_components(frame_components_old, frame_components_new);
+    if frame == 1 %first frame -> no old components
+        frame_components_old=frame_components_new;
+        continue
+    else
+        [new_objects, frame_components_old] = match_components(frame_components_old, frame_components_new);
+    end
     %this will be inside a loop with frame iterator
-    %objects = [objects new_objects];
+    objects = [objects new_objects];
+    if frame == 5 %size(dseq,3) %last frame -> all old components become new_objects
+        [new_objects, ~] = match_components(frame_components_old, []);
+        objects = [objects new_objects];
+    end
     
 end
 
