@@ -5,6 +5,6 @@ function [ background ] = get_background( seq )
 %   time to get the background
     background=median(seq,3);
     %imagesc(uint8(background));
-    imshow(uint8(background));
+    %imshow(uint8(background));
 end
 

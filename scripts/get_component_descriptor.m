@@ -3,8 +3,11 @@ function [ descriptor ] = get_component_descriptor( dimg, rgbimg, indices, cam_p
 %   Detailed explanation goes here
 
     size_dimg = size(dimg);
+    
     pc = get_point_cloud(dimg(indices),size_dimg,indices',cam_params);
+    
     P = [pc.Location(:,1)';pc.Location(:,2)';pc.Location(:,3)'];
+    
     niu = cam_params.Krgb * [cam_params.R cam_params.T] * [P;ones(1,size(P,2))];
 
     % x = miu1 / miu3    y = miu2 / miu3
