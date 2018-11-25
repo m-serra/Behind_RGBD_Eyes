@@ -36,16 +36,16 @@ end
 % Get the camera parameters
 cameramatrix = load(cameralocation);
 
-figure (1)
+%figure (1)
 % Load images
 [rgbseq, grayseq, dseq] = load_images(imagesequence);
-imagesc(uint8(dseq(:,:,1)));
+%imagesc(uint8(dseq(:,:,1)));
 
 % Point cloud
 size_dimg = size(dseq(:,:,1));
 pc = get_point_cloud(dseq(:,:,1), size_dimg, ...
                     (1:size_dimg(1)*size_dimg(2)),cameramatrix.cam_params);
-figure (2)
+%figure (2)
 % Subtract background
 background = get_background(dseq);
 

@@ -7,7 +7,7 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
 %   4. Returns connected components
     %figure(1);clf;
     %figure(2);clf;
-   
+    
     % Image without background (1: foregroung, 0: background)
     imdiff=abs(img-background)>diff_threshold;
     
@@ -33,7 +33,7 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
     initial_NumObjects = cc.NumObjects;
     for i = initial_NumObjects:-1:1
         if(length(cc.PixelIdxList{i}) < min_component_size)
-            cc.PixelIdxList(i) = []; % aliminates component
+            cc.PixelIdxList(i) = []; % eliminates component
             cc.NumObjects = cc.NumObjects -1;
         end
     end
