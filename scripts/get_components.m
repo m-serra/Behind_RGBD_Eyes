@@ -11,16 +11,21 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
     % Image without background
     imdiff=abs(img-background)>diff_threshold;
     
+    % To see the frame without background
+    %figure (21)
+    %imshow(imdiff);
+    
     % Looks for connected components and filter
     imgdiffiltered=imopen(imdiff,strel('disk',filter_size));
     
     % Gets connected components info
     cc = bwconncomp(imgdiffiltered);
     
-    figure (21)
-    imshow(imgdiffiltered);
-    figure (22)
-    imshow(imdiff);
+    % to see only the connected components
+    %figure (22)
+    %imshow(imgdiffiltered);
+    
+    
     
     
 %     Looks for connected components and filter

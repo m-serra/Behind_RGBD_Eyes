@@ -55,11 +55,11 @@ background = get_background(dseq);
 objects = [];
 
 % parameters
-diff_threshold = 0.2;
+diff_threshold = 0.2
 filter_size = 10;
 
 % iterate over frames:
-for frame=15:16%size(dseq,3)
+for frame=1:5%size(dseq,3)
     % get components for a given frame
     cc = get_components(background, dseq(:,:,frame), diff_threshold, ...
                         filter_size);
@@ -96,11 +96,11 @@ for frame=15:16%size(dseq,3)
     
     % compare frame_components's components
     % with previous frame components
-    if frame == 15
-        frame_components_old=frame_components_new;
-        continue
-    end
-    C = match_components(frame_components_old, frame_components_new);
+%     if frame == 1
+%         frame_components_old=frame_components_new;
+%         continue
+%     end
+%     C = match_components(frame_components_old, frame_components_new);
     %this will be inside a loop with frame iterator
     %objects = [objects new_objects];
     

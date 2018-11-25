@@ -21,6 +21,9 @@ function [C] = match_components(frame_components_old, frame_components_new)
         % infinitos)
         % ----
         
+        % pensar no caso do matching para quando não há connected
+        % components na frame
+        
         % if the component in the first frame doesn't belong to a component
         % in the next frame (associated to a low cost value)
         if( C(i,assignment(i) < threshold_hungarian)
