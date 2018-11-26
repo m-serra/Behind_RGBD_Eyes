@@ -8,15 +8,16 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
     %figure(1);clf;
     %figure(2);clf;
     
-    % Image without background (1: foregroung, 0: background)
+    % Image without background (1: foreground, 0: background)
     imdiff=abs(img-background)>diff_threshold;
     
-    % eliminate pixels of dimg that don't belong to the component
-    component_d_vals = imdiff .*img;
+    % eliminate pixels of dimg that don't belong to the foreground
+    component_d_vals = imdiff .* img;
     
     % the kinnect is only accurate for distances under 5m
+    % remove points at distances over the limit
     kinnect_limit = 4.5;
-    imdiff = component_d_vals < kinnect_limit & component_d_vals ~= 0;
+    imdiff = (component_d_vals < kinnect_limit) & (component_d_vals ~= 0);
     
     % To see the frame without background
     %figure (21)
@@ -28,9 +29,15 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
     % Gets connected components info
     cc = bwconncomp(imgdiffiltered);
     
+    % MAYBE WE SHOULD SUBSAMPLE HERE TO IMPROVE PERFORMANCE
+    % Split different components that my be identified as one
+    %[N C] = split_z_components(cc, d_component, d_threshold);
+    
     % Remove components that are smaller than a number of pixels
     min_component_size = 300; 
     initial_NumObjects = cc.NumObjects;
+    
+    %MELHORAR ISTO TIRANDO O FOR
     for i = initial_NumObjects:-1:1
         if(length(cc.PixelIdxList{i}) < min_component_size)
             cc.PixelIdxList(i) = []; % eliminates component
