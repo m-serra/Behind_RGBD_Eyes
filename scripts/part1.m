@@ -62,7 +62,7 @@ filter_size = 10;
 for frame=1:5%size(dseq,3)
     % get components for a given frame
     cc = get_components(background, dseq(:,:,frame), diff_threshold, ...
-                        filter_size);
+                        filter_size, rgbseq(:,:,:,frame));
                     
     %if at least one component was identified, then store info
     if cc.NumObjects > 0

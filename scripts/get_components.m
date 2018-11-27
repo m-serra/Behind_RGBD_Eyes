@@ -1,4 +1,4 @@
-function [cc] = get_components( background, img, diff_threshold, filter_size)
+function [cc] = get_components( background, img, diff_threshold, filter_size, rgb_img)
 %GET_COMPONENTS Function for retrrieving components in a given image
 %   This function works as follows:
 %   1- subtracts the background image to the current img
@@ -29,21 +29,32 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
     % Gets connected components info
     cc = bwconncomp(imgdiffiltered);
     
+    for i = 1:cc.NumObjects
+        figure(20+i);
+        plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
+    end
+    
     % MAYBE WE SHOULD SUBSAMPLE HERE TO IMPROVE PERFORMANCE
-    % Split different components that my be identified as one
-    %[N C] = split_z_components(cc, d_component, d_threshold);
+    % Split different components that my be identified as one                 
+    tic
+    cc = split_z_components(cc, img, 0.2);
+    toc
+    
+    for i = 1:cc.NumObjects
+        figure(20+i);
+        plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
+    end
     
     % Remove components that are smaller than a number of pixels
-    min_component_size = 300; 
+    min_component_size = 300; % PASSAR COMO PARAMETRO 
     initial_NumObjects = cc.NumObjects;
-    
-    %MELHORAR ISTO TIRANDO O FOR
     for i = initial_NumObjects:-1:1
         if(length(cc.PixelIdxList{i}) < min_component_size)
             cc.PixelIdxList(i) = []; % eliminates component
             cc.NumObjects = cc.NumObjects -1;
         end
     end
+    
     
     % to see only the connected components
     %figure (22)
