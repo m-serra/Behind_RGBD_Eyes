@@ -11,11 +11,12 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
     % Image without background (1: foreground, 0: background)
     imdiff=abs(img-background)>diff_threshold;
     
-    % eliminate pixels of dimg that don't belong to the foreground
+    % Add depth information to Foreground components
     component_d_vals = imdiff .* img;
     
     % the kinnect is only accurate for distances under 5m
     % remove points at distances over the limit
+    % remove points with zero distance
     kinnect_limit = 4.5;
     imdiff = (component_d_vals < kinnect_limit) & (component_d_vals ~= 0);
     
@@ -29,22 +30,22 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
     % Gets connected components info
     cc = bwconncomp(imgdiffiltered);
     
-    for i = 1:cc.NumObjects
-        figure(20+i);
-        plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
-    end
+%     for i = 1:cc.NumObjects
+%         figure(20+i);
+%         plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
+%     end
     
     % MAYBE WE SHOULD SUBSAMPLE HERE TO IMPROVE PERFORMANCE
-    % Split different components that my be identified as one                 
-    tic
-    cc = split_z_components(cc, img, 0.2);
-    toc
+    % Split different components that might be identified as one                 
+     tic
+     cc = split_z_components(cc, img, 0.1);
+     toc
     
-    for i = 1:cc.NumObjects
-        figure(20+i);
-        plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
-    end
-    
+%     for i = 1:cc.NumObjects
+%         figure(20+i);
+%         plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
+%     end
+%     
     % Remove components that are smaller than a number of pixels
     min_component_size = 300; % PASSAR COMO PARAMETRO 
     initial_NumObjects = cc.NumObjects;
@@ -54,23 +55,7 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
             cc.NumObjects = cc.NumObjects -1;
         end
     end
-    
-    
-    % to see only the connected components
-    %figure (22)
-    %imshow(imgdiffiltered);  
-    
-%     Looks for connected components and filter
-%     figure(1);
-%     imagesc([imdiff imgdiffiltered]);
-%     title('Difference image and morph filtered');
-%     colormap(gray);
-    
-%     Compares previous image with background
-%     figure(2);
-%     imagesc([img background]);
-%     title('Depth image i and background image');
-%     
+         
 %     Differemt components are assgined different colors
      figure(5);
      imagesc(bwlabel(imgdiffiltered));

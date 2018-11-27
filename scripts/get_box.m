@@ -29,9 +29,9 @@ Z = [pc.ZLimits(1) pc.ZLimits(1) pc.ZLimits(1) pc.ZLimits(1) ...
 figure(10);
 showPointCloud(pc);
 title('All components');
-xlim([0 2.5]);
-ylim([-0.2 1.2]);
-zlim([2 5]);
+%xlim([0 2.5]);
+%ylim([-0.2 1.2]);
+%zlim([2 5]);
 xlabel('x');
 ylabel('y');
 zlabel('z');

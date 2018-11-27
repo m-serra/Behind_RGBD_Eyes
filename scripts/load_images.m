@@ -1,4 +1,4 @@
-function [ rgbseq, grayseq, dseq ] = load_images( imgseq)
+function [ rgbseq, grayseq, dseq ] = load_images(imgseq)
     %LOAD_IMAGES Function responsible for loading images
     %   Reads the imgseq structure, that contains an array with
     %   the names of both the depth images and rgb images
@@ -6,8 +6,7 @@ function [ rgbseq, grayseq, dseq ] = load_images( imgseq)
     %   the gray scale sequence and the depth sequence
     
     % ATTENTION MUST CHANGE
-    %seq_size = length(imgseq);
-    seq_size = 20;
+    seq_size = length(imgseq);
     rgbseq = zeros(480, 640, 3, seq_size); % array of cubes to put all rgb images
     grayseq = zeros(480, 640, seq_size); % cube to put all gray images
     dseq = zeros(480, 640, seq_size); % cube to put all depth images
