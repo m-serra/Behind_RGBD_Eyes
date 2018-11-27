@@ -20,8 +20,8 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
     imdiff = (component_d_vals < kinnect_limit) & (component_d_vals ~= 0);
     
     % To see the frame without background
-    %figure (21)
-    %imshow(imdiff);
+    % figure (21)
+    % imshow(imdiff);
     
     % Looks for connected components and filter
     imgdiffiltered=imopen(imdiff,strel('disk',filter_size));
@@ -60,7 +60,7 @@ function [cc] = get_components( background, img, diff_threshold, filter_size)
 %     imagesc([img background]);
 %     title('Depth image i and background image');
 %     
-%     Differemt components are assgined different colors
+%     Different components are assgined different colors
      figure(5);
      imagesc(bwlabel(imgdiffiltered));
      title('Connected components');
