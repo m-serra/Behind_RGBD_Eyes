@@ -59,7 +59,7 @@ diff_threshold = 0.2;
 filter_size = 10;
 
 % iterate over frames:
-for frame=1:5%size(dseq,3)
+for frame=1:1%size(dseq,3)
     % get components for a given frame
     cc = get_components(background, dseq(:,:,frame), diff_threshold, ...
                         filter_size, rgbseq(:,:,:,frame));
