@@ -18,7 +18,7 @@ end
 
 % sorting the files names through their natural order
 % rgb_images = natsortfiles({rgb_images.name});
-% depth_images = natsortfiles({depth_images.name});
+% depth_sorted = natsortfiles({depth_images.name});
 
 % preallocation of memory
 imagesequence = struct('rgb', cell(1, length(depth_images)), 'depth', cell(1, length(depth_images)));
