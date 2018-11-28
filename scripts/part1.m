@@ -1,6 +1,8 @@
- %% Data Preprocessing
+close all
+clear all
+%% Data Preprocessing
 
-datasetlocation = '../datasets/lab1/';
+datasetlocation = '../datasets/movingpeople/maizena_chocapics1/data_rgb/';
 
 cameralocation = '../vars/cameraparametersAsus.mat';
 
@@ -59,7 +61,7 @@ diff_threshold = 0.2;
 filter_size = 10;
 
 % iterate over frames:
-for frame=1:2%size(dseq,3)
+for frame=1:size(dseq,3)
     % get components for a given frame
     cc = get_components(background, dseq(:,:,frame), diff_threshold, ...
                         filter_size, rgbseq(:,:,:,frame));
@@ -110,7 +112,7 @@ for frame=1:2%size(dseq,3)
     end
     %this will be inside a loop with frame iterator
     objects = [objects new_objects];
-    if frame == 5 %size(dseq,3) %last frame -> all old components become new_objects
+    if frame == size(dseq,3) %last frame -> all old components become new_objects
         [new_objects, ~] = match_components(frame_components_old, []);
         objects = [objects new_objects];
     end

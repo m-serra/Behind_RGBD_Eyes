@@ -20,13 +20,7 @@ function [new_objects, frame_components_old] = match_components(frame_components
     
     new_objects_count = 0;
     for i=1:length(assignment)
-           
-        % meter caso de o assignment dar 0 (linha ou coluna toda a
-        % infinitos)
-        % ----
-        
-        % pensar no caso do matching para quando n�o h� connected
-        % components na frame
+       
         
         % if the component in the first frame doesn't belong to a component
         % in the next frame (associated to a low cost value)
@@ -44,13 +38,12 @@ function [new_objects, frame_components_old] = match_components(frame_components
             frame_components_new(assignment(i)).X = [frame_components_old(i).X; frame_components_new(assignment(i)).X];
             frame_components_new(assignment(i)).Y = [frame_components_old(i).Y; frame_components_new(assignment(i)).Y];
             frame_components_new(assignment(i)).Z = [frame_components_old(i).Z; frame_components_new(assignment(i)).Z];
-           % add the component frame and coordinates from frame old to
-           % frame new of the correspondent matching component
-           % TODO
             
         end
     end
+    
     frame_components_old = frame_components_new;
+    
     if new_objects_count == 0
         new_objects = [];
     end

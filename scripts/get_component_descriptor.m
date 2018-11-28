@@ -3,6 +3,7 @@ function [ descriptor ] = get_component_descriptor( dimg, rgbimg, indices, cam_p
 %   Detailed explanation goes here
 
     size_dimg = size(dimg);
+    area_dimg = numel(dimg);
     
     pc = get_point_cloud(dimg(indices),size_dimg,indices',cam_params);
     
@@ -16,9 +17,10 @@ function [ descriptor ] = get_component_descriptor( dimg, rgbimg, indices, cam_p
     y2=round(niu(2,:)./niu(3,:));
     
     component_rgb=zeros(size(P,2),3);
-    indsclean=find((x2>=1)&(x2<=641)&(y2>=1)&(y2<=480));
-    indscolor=sub2ind([480 640],y2(indsclean),x2(indsclean));
-    rgb_img_aux=reshape(rgbimg,[640*480 3]);
+    indsclean=find((x2>=1)&(x2<=size_dimg(2)+1)&(y2>=1)&(y2<=size_dimg(1)+1));
+    indscolor=sub2ind(size_dimg,y2(indsclean),x2(indsclean));
+    rgb_img_aux=reshape(rgbimg,[area_dimg 3]);
+    
     component_rgb(indsclean,:)=rgb_img_aux(indscolor,:)/255;
     component_hsv = rgb2hsv(component_rgb);
     h_histogram = histcounts(component_hsv(:,1),10);
