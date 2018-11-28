@@ -11,7 +11,6 @@ function plot_component_depth_value_in_rgb_img(depth_img, rgb_img, component_ind
             end
     end
     
-    figure(12)
     imshow(uint8(rgb_img));
     
 end

@@ -40,7 +40,6 @@ function [new_objects, frame_components_old] = match_components(frame_components
             %if( C(i,assignment(i)) < threshold_hungarian)
             % insert the component in the new_objects and it wont be used
             % in the next frame
-            % TODO
             frame_components_new(assignment(i)).frame = [frame_components_old(i).frame frame_components_new(assignment(i)).frame];
             frame_components_new(assignment(i)).X = [frame_components_old(i).X; frame_components_new(assignment(i)).X];
             frame_components_new(assignment(i)).Y = [frame_components_old(i).Y; frame_components_new(assignment(i)).Y];
