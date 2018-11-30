@@ -11,8 +11,11 @@ function cc = split_z_components(cc, d_img, d_threshold)
     %kernels
     k(1,:,:) = [0 -1 0; 0 1 0; 0 0 0]; % cost of going down
     k(2,:,:) = [0 0 0; -1 1 0; 0 0 0]; % cost of going right
+    k(3,:,:) = [-1 0 0; 0 1 0; 0 0 0]; % cost of going NW-SW diagonal
+    k(4,:,:) = [0 0 0; 0 1 0; -1 0 0]; % cost of going SW-NE diagonal
     
-    for c = length(cc.NumObjects):-1:1
+    n_components = cc.NumObjects;
+    for c = n_components:-1:1
                
         % obtain the component in depth values instead of 1s and 0s
         d_component = d_img( cc_indx(c).SubarrayIdx{1}(1):cc_indx(c).SubarrayIdx{1}(end), ...
@@ -22,7 +25,7 @@ function cc = split_z_components(cc, d_img, d_threshold)
 
         % convolve each kernel with d_component to get the cost of going in 
         % each direction. Add the costs to a matrix of adjacencies
-        for i = 1:2
+        for i = 1:4
 
             %obtain the cost of each edge with a 2D convolution
             kernel = squeeze(k(i,:,:));
@@ -36,11 +39,18 @@ function cc = split_z_components(cc, d_img, d_threshold)
             elseif i == 2
                 col2 = col1 + 1;
                 row2 = row1;
+            elseif i == 3
+                col2 = col1 + 1;
+                row2 = row1 + 1;
+            elseif i == 4
+                col2 = col1 + 1;
+                row2 = row1 - 1;    
             end
             
-            % iterate all edges
+            % iterate all new edges
             for j = 1:length(cost)
-                if(col2(j) <= size(d_component,2) && row2(j) <= size(d_component,1))
+                if(col2(j) > 0 && row2(j) > 0 ... 
+                   && col2(j) <= size(d_component,2) && row2(j) <= size(d_component,1))
  
                     ind1 = sub2ind(size(d_component), row1(j), col1(j)); % edge start pixel
                     ind2 = sub2ind(size(d_component), row2(j), col2(j)); % edge end pixel

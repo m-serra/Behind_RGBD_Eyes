@@ -30,22 +30,22 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
     % Gets connected components info
     cc = bwconncomp(imgdiffiltered);
     
-%     for i = 1:cc.NumObjects
-%         figure(20+i);
-%         plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
-%     end
-    
+      %for i = 1:cc.NumObjects
+       %   figure(20+i);
+       %   plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
+      %end
+     
     % MAYBE WE SHOULD SUBSAMPLE HERE TO IMPROVE PERFORMANCE
     % Split different components that might be identified as one                 
      tic
-     cc = split_z_components(cc, img, 0.1);
+     cc = split_z_components(cc, img, 0.2);
      toc
     
-%     for i = 1:cc.NumObjects
-%         figure(20+i);
-%         plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
-%     end
-%     
+%      for i = 1:cc.NumObjects
+%          figure(20+i);
+%          plot_component_depth_value_in_rgb_img(img, rgb_img, cc.PixelIdxList{i});
+%      end
+%      
     % Remove components that are smaller than a number of pixels
     min_component_size = 300; % PASSAR COMO PARAMETRO 
     initial_NumObjects = cc.NumObjects;
