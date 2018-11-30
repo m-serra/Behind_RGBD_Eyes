@@ -37,9 +37,9 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
     
     % MAYBE WE SHOULD SUBSAMPLE HERE TO IMPROVE PERFORMANCE
     % Split different components that might be identified as one                 
-     tic
-     cc = split_z_components(cc, img, 0.1);
-     toc
+      tic
+      cc = split_z_components(cc, img, 0.1);
+      toc
     
 %     for i = 1:cc.NumObjects
 %         figure(20+i);

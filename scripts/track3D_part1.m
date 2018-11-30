@@ -83,4 +83,8 @@ for frame=1:size(dseq,3)
     
 end
 
+% take from the objects structure the components that only appear in one
+% frame (according to the professor, those components are not meaningful)
+objects = clean_single_objects(objects);
+
 end

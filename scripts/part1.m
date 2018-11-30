@@ -1,8 +1,9 @@
 %% Data Preprocessing
 
-datasetlocation = '../datasets/maizena_chocapics1/data_rgb/';
+datasetlocation = '../datasets/lab1/';
 
 cameralocation = '../vars/cameraparametersAsus.mat';
+
 
 % CREATE image sequence
 % Get the list of images names
