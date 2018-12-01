@@ -1,6 +1,11 @@
 function [new_objects, frame_components_old] = match_components(frame_components_old, frame_components_new)
 %MATCH_COMPONENTS Summary of this function goes here
 %   Detailed explanation goes here
+
+
+    % weights
+    distance_weight = 0.7;
+    colour_weight = 0.3;
     new_objects = struct( 'frame',cell(1,1), ...
                                    'X',cell(1,1), ...
                                    'Y',cell(1,1), ... 
@@ -8,7 +13,9 @@ function [new_objects, frame_components_old] = match_components(frame_components
     C = zeros(size(frame_components_old,2),size(frame_components_new,2));
     for i=1:size(frame_components_old,2)
         for j=1:size(frame_components_new,2)
-            C(i,j) = KLDiv(frame_components_old(i).descriptor(1,:),frame_components_new(j).descriptor(1,:));
+            distance_cost = norm(frame_components_old(i).descriptor{1} - frame_components_new(j).descriptor{1});
+            colour_cost = KLDiv(frame_components_old(i).descriptor{2}(1,:),frame_components_new(j).descriptor{2}(1,:));
+            C(i,j) = distance_weight*distance_cost + colour_weight*colour_cost;
         end
     end
     

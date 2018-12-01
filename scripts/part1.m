@@ -1,6 +1,6 @@
 %% Data Preprocessing
 
-datasetlocation = '../datasets/lab1/';
+datasetlocation = '../datasets/maizena_chocapics1/';
 
 cameralocation = '../vars/cameraparametersAsus.mat';
 
