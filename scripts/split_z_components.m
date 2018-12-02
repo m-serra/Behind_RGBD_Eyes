@@ -15,23 +15,35 @@ function cc = split_z_components(cc, d_img, d_threshold)
     k(4,:,:) = [0 0 0; 0 1 0; -1 0 0]; % cost of going SW-NE diagonal
     
     n_components = cc.NumObjects;
+    
     for c = n_components:-1:1
                
         % obtain the component in depth values instead of 1s and 0s
         d_component = d_img( cc_indx(c).SubarrayIdx{1}(1):cc_indx(c).SubarrayIdx{1}(end), ...
                              cc_indx(c).SubarrayIdx{2}(1):cc_indx(c).SubarrayIdx{2}(end));
-       
-        adj_matrix = zeros(numel(d_component), numel(d_component));
-
+        
+        component_size = numel(d_component);
+        %adj_matrix = zeros(numel(d_component), numel(d_component));
+        costs =zeros(1, 8 * component_size);
+        ind1 = zeros(1, 8 * component_size);
+        ind2 = zeros(1, 8 * component_size);
+        row1 = zeros(1, component_size);
+        col1 = zeros(1, component_size);
+        row2 = zeros(1, component_size);
+        col2 = zeros(1, component_size);
+        
+        
         % convolve each kernel with d_component to get the cost of going in 
         % each direction. Add the costs to a matrix of adjacencies
         for i = 1:4
-
+            
+            init_pos = ((i-1)*component_size)+1;
+            
             %obtain the cost of each edge with a 2D convolution
             kernel = squeeze(k(i,:,:));
-            costs = abs(conv2(d_component, kernel, 'same')) + 1;
-            
-            [row1, col1, cost] = find(costs);
+            costs_matrix = abs(conv2(d_component, kernel, 'same')) + 1;
+              
+            [row1, col1, costs(init_pos:init_pos+component_size-1)] = find(costs_matrix);
 
             if i == 1
                 col2 = col1;
@@ -48,28 +60,37 @@ function cc = split_z_components(cc, d_img, d_threshold)
             end
             
             % iterate all new edges
-            for j = 1:length(cost)
+            for j = 1:component_size
                 if(col2(j) > 0 && row2(j) > 0 ... 
                    && col2(j) <= size(d_component,2) && row2(j) <= size(d_component,1))
  
-                    ind1 = sub2ind(size(d_component), row1(j), col1(j)); % edge start pixel
-                    ind2 = sub2ind(size(d_component), row2(j), col2(j)); % edge end pixel
+                    ind1(init_pos+j-1) = sub2ind(size(d_component), row1(j), col1(j)); % edge start pixel
+                    ind2(init_pos+j-1) = sub2ind(size(d_component), row2(j), col2(j)); % edge end pixel
 
-                    % add edges to the adjacency matrix
-                    adj_matrix(ind1, ind2) = cost(j,1);
-                    adj_matrix(ind2, ind1) = cost(j,1);
+                else
+                    costs(init_pos+j-1) = 0;
                 end
             end
         end
-
+        
+        middle_index = length(ind1)/2+1;
+        ind1(middle_index:end) = ind2(1:middle_index-1);
+        ind2(middle_index:end) = ind1(1:middle_index-1);
+        costs(middle_index:end) = costs(1:middle_index-1);
+        
+        [~,~,vertex1] = find(ind1);
+        [~,~,vertex2] = find(ind2);
+        [~,~,edges] = find(costs);
+        
         %eliminate the edges that have a cost higher than the threshold
-        accepted_edges = adj_matrix < max_pixel_dist;
-        adj_matrix = adj_matrix .* accepted_edges;
-
-        graph = sparse(adj_matrix);
+        accepted_edges = edges < max_pixel_dist;
+        edges = edges .* accepted_edges;
+        
+        graph = sparse(vertex1, vertex2, edges);
 
         % find the connected components of the graph
         [S, C] = graphconncomp(graph);
+     
         
         % Finally update the components in cc
         d_component_original_indx = d_img_indx(...
