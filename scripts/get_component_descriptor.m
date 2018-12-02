@@ -2,11 +2,16 @@ function [ descriptor ] = get_component_descriptor( dimg, rgbimg, indices, cam_p
 %GET_COMPONENTS_DESCRIPTOR Summary of this function goes here
 %   Detailed explanation goes here
 
+    % descriptor -> component location and colour histogram
+    descriptor = cell(1,2);
+    
     size_dimg = size(dimg);
     area_dimg = numel(dimg);
     
     pc = get_point_cloud(dimg(indices),size_dimg,indices',cam_params);
     
+    % descriptor{1} = [mean(X) mean(Y) mean(Z)]
+    descriptor{1} = mean(pc.Location,1);
     P = [pc.Location(:,1)';pc.Location(:,2)';pc.Location(:,3)'];
     
     niu = cam_params.Krgb * [cam_params.R cam_params.T] * [P;ones(1,size(P,2))];
@@ -25,7 +30,8 @@ function [ descriptor ] = get_component_descriptor( dimg, rgbimg, indices, cam_p
     component_hsv = rgb2hsv(component_rgb);
     h_histogram = histcounts(component_hsv(:,1),10);
     s_histogram = histcounts(component_hsv(:,2),10);
-    descriptor = [h_histogram; s_histogram];
+
+    descriptor{2} = [h_histogram; s_histogram];
     
 %     pc=pointCloud(P', 'color',uint8(component_rgb*255));
 %     figure(7); showPointCloud(pc);

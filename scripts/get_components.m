@@ -21,8 +21,8 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
     imdiff = (component_d_vals < kinnect_limit) & (component_d_vals ~= 0);
     
     % To see the frame without background
-    %figure (21)
-    %imshow(imdiff);
+    % figure (21)
+    % imshow(imdiff);
     
     % Looks for connected components and filter
     imgdiffiltered=imopen(imdiff,strel('disk',filter_size));
@@ -55,8 +55,24 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
             cc.NumObjects = cc.NumObjects -1;
         end
     end
-         
-%     Differemt components are assgined different colors
+    
+    % to see only the connected components
+    %figure (22)
+    %imshow(imgdiffiltered);  
+    
+%     Looks for connected components and filter
+%     figure(1);
+%     imagesc([imdiff imgdiffiltered]);
+%     title('Difference image and morph filtered');
+%     colormap(gray);
+    
+%     Compares previous image with background
+%     figure(2);
+%     imagesc([img background]);
+%     title('Depth image i and background image');
+%     
+%     Different components are assgined different colors
+
      figure(5);
      imagesc(bwlabel(imgdiffiltered));
      title('Connected components');
