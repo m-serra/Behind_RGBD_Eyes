@@ -23,7 +23,6 @@ function cc = split_z_components(cc, d_img, d_threshold)
                              cc_indx(c).SubarrayIdx{2}(1):cc_indx(c).SubarrayIdx{2}(end));
         
         component_size = numel(d_component);
-        %adj_matrix = zeros(numel(d_component), numel(d_component));
         costs =zeros(1, 8 * component_size);
         ind1 = zeros(1, 8 * component_size);
         ind2 = zeros(1, 8 * component_size);
@@ -31,10 +30,9 @@ function cc = split_z_components(cc, d_img, d_threshold)
         col1 = zeros(1, component_size);
         row2 = zeros(1, component_size);
         col2 = zeros(1, component_size);
-        
-        
+          
         % convolve each kernel with d_component to get the cost of going in 
-        % each direction. Add the costs to a matrix of adjacencies
+        % each direction
         for i = 1:4
             
             init_pos = ((i-1)*component_size)+1;
@@ -73,11 +71,14 @@ function cc = split_z_components(cc, d_img, d_threshold)
             end
         end
         
+        % edges are bidirectional add the inverse direction of the ones
+        % alread computed
         middle_index = length(ind1)/2+1;
         ind1(middle_index:end) = ind2(1:middle_index-1);
         ind2(middle_index:end) = ind1(1:middle_index-1);
         costs(middle_index:end) = costs(1:middle_index-1);
         
+        % eliminate zero valued coordinates and edges
         [~,~,vertex1] = find(ind1);
         [~,~,vertex2] = find(ind2);
         [~,~,edges] = find(costs);
