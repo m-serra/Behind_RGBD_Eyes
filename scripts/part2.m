@@ -58,14 +58,17 @@ size_dimg = size(dseq_cam1(:,:,1)); % stores size of dimg
 
 % Stage 1: Identify R, T from cam2 to cam1 referential
 %
-% matches_3D contains all the key matched points, in 3D!
+% matches_3D contains matched points from 2 cams, to calculate R and T
 % first 3 columns are the coordinates in cam1 referential (columns 1,2,3)
 % last 3 columns are the coordinates in cam2 referential (columns 4,5,6)
-% contains as many rows as matched pair points among all frames
+% contains as many rows as matched pair points.
+% For robustness, we will use points from the first and last frame. Note
+% that one frame would be enough, but if the chosen frame has few
+% keypoints, it might be helpful to have a second frame, hopefully with
+% different keypoints
 matches_3D = [];
-point_sum_cam1 = [0 0 0];
-point_sum_cam2 = [0 0 0];
-for frame=1:n_frames
+ransac_frames = [1 n_frames];
+for frame=ransac_frames
     % 1.1) Find keypoints for the pair of images (cam1,cam2)
     % key point detection using SIFT:
     % check http://www.vlfeat.org/overview/sift.html for detais
@@ -79,28 +82,14 @@ for frame=1:n_frames
     [matches, scores] = vl_ubcmatch(d_cam1, d_cam2, match_threshold);
     
     % Convert points in 3D coordinates in the corresponding frame
-    indices_cam1 = matches(1,:);
-    indices_cam2 = matches(2,:);
-    dimg_cam1 = dseq_cam1(:,:,frame);
-    dimg_cam2 = dseq_cam2(:,:,frame);
+    indices_cam1_rgb = matches(1,:);
+    indices_cam2_rgb = matches(2,:);
     
-    pc_cam1 = get_point_cloud(dimg_cam1(indices_cam1),...
-                              size_dimg, indices_cam1,cam_params);
-    pc_cam2 = get_point_cloud(dimg_cam2(indices_cam2),...
-                              size_dimg, indices_cam2,cam_params);
-    
-    frame_matches = [pc_cam1.Location pc_cam2.Location];
+    cam1_3D = rgb_to_xyz(indices_cam1_rgb, dseq_cam1(:,:,frame),cam_params);
+    cam2_3D = rgb_to_xyz(indices_cam2_rgb, dseq_cam2(:,:,frame),cam_params);
+        
+    frame_matches = [cam1_3D' cam2_3D'];
     matches_3D = [matches_3D;frame_matches]; 
-    
-    % accumulate the sum of all 3D points to calculate centroid later on
-    total_points_cam1 = get_point_cloud(dimg_cam1, size_dimg, ...
-                                        (1:size_dimg(1)*size_dimg(2)),...
-                                        cam_params);
-    total_points_cam2 = get_point_cloud(dimg_cam2, size_dimg, ...
-                                        (1:size_dimg(1)*size_dimg(2)),...
-                                        cam_params);
-    point_sum_cam1 = point_sum_cam1 + sum(total_points_cam1.Location);
-    point_sum_cam2 = point_sum_cam2 + sum(total_points_cam2.Location);
     
 end
 
@@ -121,8 +110,7 @@ C = A*B';
 [U,S,V] = svd(C, 'econ');
 
 R = U*V';
-
-% T = centroid P2 - R*centroidP1
+T = cam2_centroid - R*cam1_centroid;
 
 % Stage 2: Run track3D_part1() for imagesequence_cam1 and imagesequence_cam2
 
