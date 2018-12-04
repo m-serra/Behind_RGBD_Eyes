@@ -63,6 +63,8 @@ size_dimg = size(dseq_cam1(:,:,1)); % stores size of dimg
 % last 3 columns are the coordinates in cam2 referential (columns 4,5,6)
 % contains as many rows as matched pair points among all frames
 matches_3D = [];
+point_sum_cam1 = [0 0 0];
+point_sum_cam2 = [0 0 0];
 for frame=1:n_frames
     % 1.1) Find keypoints for the pair of images (cam1,cam2)
     % key point detection using SIFT:
@@ -89,7 +91,17 @@ for frame=1:n_frames
     
     frame_matches = [pc_cam1.Location pc_cam2.Location];
     matches_3D = [matches_3D;frame_matches]; 
-
+    
+    % accumulate the sum of all 3D points to calculate centroid later on
+    total_points_cam1 = get_point_cloud(dimg_cam1, size_dimg, ...
+                                        (1:size_dimg(1)*size_dimg(2)),...
+                                        cam_params);
+    total_points_cam2 = get_point_cloud(dimg_cam2, size_dimg, ...
+                                        (1:size_dimg(1)*size_dimg(2)),...
+                                        cam_params);
+    point_sum_cam1 = point_sum_cam1 + sum(total_points_cam1.Location);
+    point_sum_cam2 = point_sum_cam2 + sum(total_points_cam2.Location);
+    
 end
 
 % 1.3) Filter out outlier matches by applying RANSAC method
@@ -97,13 +109,26 @@ end
 % variable description next to its first instantiation. 
 
 
-
 % 1.4) Fit R and T using pair points obtained after applying RANSAC in 1.3
+% We should use PROCRUSTES solution
+% 1. Remove centroid
+cam1_centroid = point_sum_cam1/(size_dimg(1)*size_dimg(2)*n_frames);
+cam2_centroid = point_sum_cam2/(size_dimg(1)*size_dimg(2)*n_frames);
+A = matches_3D_filtered(:,1:3)';
+B = matches_3D_filtered(:,4:6)';
+
+C = A*B';
+[U,S,V] = svd(C, 'econ');
+
+R = U*V';
+
+% T = centroid P2 - R*centroidP1
 
 % Stage 2: Run track3D_part1() for imagesequence_cam1 and imagesequence_cam2
 
 % Stage 3: Represent components in 3D (point cloud), join possible
 % intersecting components. 
+% look for iterative closest points - wikipedia
 
 
 % In the end return all identified components (identified only by cam1, only by cam2 and by both)
