@@ -96,13 +96,31 @@ end
 % 1.3) Filter out outlier matches by applying RANSAC method
 % At this stage we have all the pair points in the variable matches_3D. See
 % variable description next to its first instantiation. 
+max_iter = 100; % calculate according to the probability of outliers
+for ransac_i=1:max_iter
+    % 1. Pick randomly 4 pair of points 
+    % note: randperm ensures non repeating indices
+    rand_indices = randperm(size(matches_3D, 1),4);
+    cam1_points = matches_3D(rand_indices,1:3);
+    cam2_points = matches_3D(rand_indices,4:6);
+    
+    % 2. Procrustes
+    [d, Z, tr] = procrustes(cam1_points, cam2_points, 'Scaling',false, ...
+                            'Reflection',false);
+    
+    % 3. Compute error
+    predicted_cam1 = matches_3D(:,1:3)*tr.T + ...
+                     repmat(tr.c(1,:),size(matches_3D, 1),1);
+    diff = matches_3D(:,1:3) - predicted_cam1;
+    error = sqrt(sum(diff.^2,2));
+    
+    % inliers
 
+end
 
 % 1.4) Fit R and T using pair points obtained after applying RANSAC in 1.3
 % We should use PROCRUSTES solution
 % 1. Remove centroid
-cam1_centroid = point_sum_cam1/(size_dimg(1)*size_dimg(2)*n_frames);
-cam2_centroid = point_sum_cam2/(size_dimg(1)*size_dimg(2)*n_frames);
 A = matches_3D_filtered(:,1:3)';
 B = matches_3D_filtered(:,4:6)';
 
