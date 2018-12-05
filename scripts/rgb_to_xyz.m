@@ -1,4 +1,4 @@
-function [ rgb_3D ] = rgb_to_xyz(rgb_indices, dimg, cam_params)
+function [ rgb_3D ] = rgb_to_xyz(rgb_sift_points, dimg, cam_params)
 %RGB_TO_XYZ Function to perform the conversion from rgb coordinates to 3D
 %coordinates
 %   To convert a point in a rgb image to 3D coordinates we need depth
@@ -29,9 +29,9 @@ depth_in_rgb = [u_rgb;v_rgb];
 
 % STEP 2
 rgb_3D = [];
-for rgb_point=1:size(rgb_indices,2)
+for i=1:size(rgb_sift_points,1)
     % point in rgb that we want to identify
-    [v_goal, u_goal] = ind2sub(size_dimg, rgb_indices(rgb_point));
+    u_goal=rgb_sift_points(i,1); v_goal=rgb_sift_points(i,2);
     goal = repmat([u_goal;v_goal], 1, size_dimg(1)*size_dimg(2));
     
     points_distance = goal - depth_in_rgb;

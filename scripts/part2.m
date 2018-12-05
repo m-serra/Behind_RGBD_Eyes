@@ -1,6 +1,6 @@
 %% Data Preprocessing
 
-datasetlocation = '../datasets/maizena_chocapics_2cam/';
+datasetlocation = '../datasets/lab1/';
 cameralocation = '../vars/cameraparametersAsus.mat';
 
 
@@ -58,10 +58,10 @@ size_dimg = size(dseq_cam1(:,:,1)); % stores size of dimg
 
 % Stage 1: Identify R, T from cam2 to cam1 referential
 %
-% matches_3D contains matched points from 2 cams, to calculate R and T
+% matches_3D contains matched points from 2 cams, to calculate R and T.
 % first 3 columns are the coordinates in cam1 referential (columns 1,2,3)
 % last 3 columns are the coordinates in cam2 referential (columns 4,5,6)
-% contains as many rows as matched pair points.
+% contains as many rows as matched pair points;
 % For robustness, we will use points from the first and last frame. Note
 % that one frame would be enough, but if the chosen frame has few
 % keypoints, it might be helpful to have a second frame, hopefully with
@@ -78,18 +78,25 @@ for frame=ransac_frames
     % 1.2) Match keypoints
     % we can apply a 1st filter at this stage to remove noisy matches from
     % the beggining, by reducing the threshold 
+    % Note: vl_ubcmatch returns the indexes of the SIFT identified points,
+    % not the indices of the real points. 
+    % Check http://www.vlfeat.org/overview/sift.html for complete info
+ 
     match_threshold = 1.5; % 1.5 is the default value
     [matches, scores] = vl_ubcmatch(d_cam1, d_cam2, match_threshold);
+    matches = round([f_cam1(1:2,matches(1,:))' f_cam2(1:2,matches(2,:))']);
+    
+    % plotting
+    plot_sift(grayseq_cam1(:,:,frame),grayseq_cam2(:,:,frame), matches);
     
     % Convert points in 3D coordinates in the corresponding frame
-    indices_cam1_rgb = matches(1,:);
-    indices_cam2_rgb = matches(2,:);
+    u_cam1_rgb = matches(:,1); v_cam1_rgb = matches(:,2);
+    u_cam2_rgb = matches(:,3); v_cam2_rgb = matches(:,4);
     
-    cam1_3D = rgb_to_xyz(indices_cam1_rgb, dseq_cam1(:,:,frame),cam_params);
-    cam2_3D = rgb_to_xyz(indices_cam2_rgb, dseq_cam2(:,:,frame),cam_params);
+    cam1_3D = rgb_to_xyz([u_cam1_rgb v_cam1_rgb], dseq_cam1(:,:,frame),cam_params);
+    cam2_3D = rgb_to_xyz([u_cam2_rgb v_cam2_rgb], dseq_cam2(:,:,frame),cam_params);
         
-    frame_matches = [cam1_3D' cam2_3D'];
-    matches_3D = [matches_3D;frame_matches]; 
+    matches_3D = [matches_3D; [cam1_3D' cam2_3D']]; 
     
 end
 
