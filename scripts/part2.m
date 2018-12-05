@@ -96,7 +96,8 @@ end
 % 1.3) Filter out outlier matches by applying RANSAC method
 % At this stage we have all the pair points in the variable matches_3D. See
 % variable description next to its first instantiation. 
-max_iter = 100; % calculate according to the probability of outliers
+max_iter = 200; % calculate according to the probability of outliers
+inliers = [0 0 0 0 0 0];
 for ransac_i=1:max_iter
     % 1. Pick randomly 4 pair of points 
     % note: randperm ensures non repeating indices
@@ -113,22 +114,27 @@ for ransac_i=1:max_iter
                      repmat(tr.c(1,:),size(matches_3D, 1),1);
     diff = matches_3D(:,1:3) - predicted_cam1;
     error = sqrt(sum(diff.^2,2));
-    
-    % inliers
+    inliers_idx = error<0.2;
+    if sum(double(inliers_idx)) > size(inliers,1)
+        inliers = [matches_3D(inliers_idx, 1:3) ...
+                   matches_3D(inliers_idx, 4:6)];
+    end
 
 end
 
 % 1.4) Fit R and T using pair points obtained after applying RANSAC in 1.3
 % We should use PROCRUSTES solution
-% 1. Remove centroid
-A = matches_3D_filtered(:,1:3)';
-B = matches_3D_filtered(:,4:6)';
+[d, Z, tr] = procrustes(inliers(:,1:3), inliers(:,4:6), 'Scaling',false,...
+                        'Reflection',false);
+                    
+% Checking total error:
+predicted_cam1 = matches_3D(:,1:3)*tr.T + ...
+                            repmat(tr.c(1,:),size(matches_3D, 1),1);
+diff = matches_3D(:,1:3) - predicted_cam1;
+error = sqrt(sum(diff.^2,2));
+total_wrong_matches = sum(double(error>0.25));
 
-C = A*B';
-[U,S,V] = svd(C, 'econ');
 
-R = U*V';
-T = cam2_centroid - R*cam1_centroid;
 
 % Stage 2: Run track3D_part1() for imagesequence_cam1 and imagesequence_cam2
 
