@@ -67,7 +67,8 @@ size_dimg = size(dseq_cam1(:,:,1)); % stores size of dimg
 % keypoints, it might be helpful to have a second frame, hopefully with
 % different keypoints
 matches_3D = [];
-ransac_frames = [1 n_frames];
+
+ransac_frames = 1;%[1 n_frames];
 for frame=ransac_frames
     % 1.1) Find keypoints for the pair of images (cam1,cam2)
     % key point detection using SIFT:
@@ -104,42 +105,42 @@ end
 % At this stage we have all the pair points in the variable matches_3D. See
 % variable description next to its first instantiation. 
 max_iter = 200; % calculate according to the probability of outliers
-inliers = [0 0 0 0 0 0];
-for ransac_i=1:max_iter
-    % 1. Pick randomly 4 pair of points 
-    % note: randperm ensures non repeating indices
-    rand_indices = randperm(size(matches_3D, 1),4);
-    cam1_points = matches_3D(rand_indices,1:3);
-    cam2_points = matches_3D(rand_indices,4:6);
-    
-    % 2. Procrustes
-    [d, Z, tr] = procrustes(cam1_points, cam2_points, 'Scaling',false, ...
-                            'Reflection',false);
-    
-    % 3. Compute error
-    predicted_cam1 = matches_3D(:,1:3)*tr.T + ...
-                     repmat(tr.c(1,:),size(matches_3D, 1),1);
-    diff = matches_3D(:,1:3) - predicted_cam1;
-    error = sqrt(sum(diff.^2,2));
-    inliers_idx = error<0.2;
-    if sum(double(inliers_idx)) > size(inliers,1)
-        inliers = [matches_3D(inliers_idx, 1:3) ...
-                   matches_3D(inliers_idx, 4:6)];
-    end
 
-end
+inliers = ransac_procrustes(matches_3D, max_iter);
 
 % 1.4) Fit R and T using pair points obtained after applying RANSAC in 1.3
 % We should use PROCRUSTES solution
-[d, Z, tr] = procrustes(inliers(:,1:3), inliers(:,4:6), 'Scaling',false,...
+[~, ~, tr] = procrustes(inliers(:,1:3), inliers(:,4:6), 'Scaling',false,...
                         'Reflection',false);
                     
 % Checking total error:
-predicted_cam1 = matches_3D(:,1:3)*tr.T + ...
+predicted_cam1 = matches_3D(:,4:6)*tr.T + ...
                             repmat(tr.c(1,:),size(matches_3D, 1),1);
 diff = matches_3D(:,1:3) - predicted_cam1;
 error = sqrt(sum(diff.^2,2));
 total_wrong_matches = sum(double(error>0.25));
+
+%test point cloud
+pc1 = get_point_cloud(dseq_cam1(:,:,1), size_dimg, ...
+                    (1:size_dimg(1)*size_dimg(2)),cam_params);
+                
+figure(111);
+showPointCloud(pc1);
+                
+pc2 = get_point_cloud(dseq_cam2(:,:,1), size_dimg, ...
+                    (1:size_dimg(1)*size_dimg(2)),cam_params);
+                
+figure(222);
+showPointCloud(pc2);
+
+figure (334)
+points = pc2.Location*tr.T + ...
+                            repmat(tr.c(1,:),size(pc2.Location, 1),1);
+                        
+pc3 = pointCloud(points);
+showPointCloud(pc1);
+hold on
+showPointCloud(pc3);
 
 
 
