@@ -1,6 +1,6 @@
 %% Data Preprocessing
 
-datasetlocation = '../datasets/lab1/';
+datasetlocation = '../datasets/data_rgb_6/';
 cameralocation = '../vars/cameraparametersAsus.mat';
 
 
@@ -73,8 +73,10 @@ for frame=ransac_frames
     % 1.1) Find keypoints for the pair of images (cam1,cam2)
     % key point detection using SIFT:
     % check http://www.vlfeat.org/overview/sift.html for detais
-    [f_cam1, d_cam1] = vl_sift(single(grayseq_cam1(:,:,frame)));
-    [f_cam2, d_cam2] = vl_sift(single(grayseq_cam2(:,:,frame)));
+    peak_thresh = 0;
+    edge_thresh = 20;
+    [f_cam1, d_cam1] = vl_sift(single(grayseq_cam1(:,:,frame)),'PeakThresh', peak_thresh, 'edgethresh', edge_thresh);
+    [f_cam2, d_cam2] = vl_sift(single(grayseq_cam2(:,:,frame)),'PeakThresh', peak_thresh, 'edgethresh', edge_thresh);
     
     % 1.2) Match keypoints
     % we can apply a 1st filter at this stage to remove noisy matches from
@@ -83,7 +85,7 @@ for frame=ransac_frames
     % not the indices of the real points. 
     % Check http://www.vlfeat.org/overview/sift.html for complete info
  
-    match_threshold = 1.5; % 1.5 is the default value
+    match_threshold = 2.5; % 1.5 is the default value
     [matches, scores] = vl_ubcmatch(d_cam1, d_cam2, match_threshold);
     matches = round([f_cam1(1:2,matches(1,:))' f_cam2(1:2,matches(2,:))']);
     
@@ -104,7 +106,16 @@ end
 % 1.3) Filter out outlier matches by applying RANSAC method
 % At this stage we have all the pair points in the variable matches_3D. See
 % variable description next to its first instantiation. 
-max_iter = 200; % calculate according to the probability of outliers
+
+% S = log(1-P)/log(1-p^k)
+% P = probability of success
+% p = inliers ratio
+% k = 4 in our case
+P = 0.99;
+p = 0.5;
+k = 4;
+max_iter = round(log10(1-P) / log10(1-p^k));
+%max_iter = 200; % calculate according to the probability of outliers
 
 inliers = ransac_procrustes(matches_3D, max_iter);
 
@@ -142,7 +153,8 @@ showPointCloud(pc1);
 hold on
 showPointCloud(pc3);
 
-
+obj1 = track3D_part1(imagesequence_cam1, cam_params);
+obj2 = track3D_part1(imagesequence_cam2, cam_params);
 
 % Stage 2: Run track3D_part1() for imagesequence_cam1 and imagesequence_cam2
 
