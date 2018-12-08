@@ -153,8 +153,13 @@ showPointCloud(pc1);
 hold on
 showPointCloud(pc3);
 
+R = tr.T';
+T = tr.c(1,:)';
+
 obj1 = track3D_part1(imagesequence_cam1, cam_params);
 obj2 = track3D_part1(imagesequence_cam2, cam_params);
+
+obj2_transformed = transform_object(obj2, R, T, n_frames);
 
 % Stage 2: Run track3D_part1() for imagesequence_cam1 and imagesequence_cam2
 
