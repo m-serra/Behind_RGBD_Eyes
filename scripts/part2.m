@@ -113,7 +113,7 @@ end
 % S = log(1-P)/log(1-p^k)
 % P = probability of success
 % p = inliers ratio
-% k = 4 in our case
+% k = minimum points for estimate
 P = 0.99;
 p = 0.5;
 k = 4;
@@ -157,6 +157,10 @@ for frame = 1:n_frames
     plot_obj_boxes(obj1, frame, 'red', 1.0);
     plot_obj_boxes(obj2_transformed, frame, 'blue', 1.0);
     hold off
+    
+    if frame == 9
+        disp('here');
+    end
     
     new_objects = match_boxes( obj1, obj2_transformed, new_objects, frame);
     plot_obj_boxes(new_objects, frame, 'green', 2.0);

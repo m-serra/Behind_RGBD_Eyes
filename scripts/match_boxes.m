@@ -101,34 +101,40 @@ for i=1:length(assignment)
         
         % iterate all the frames of the new object and create the
         % respective (X Y Z)
-        for f=1:length(new_objects(new_objects_count).frame)
+        for k=1:length(new_objects(new_objects_count).frame)
+            f = new_objects(new_objects_count).frame(k);
+            
             a = ismember(f,obj1(i).frame);
             b = ismember(f,obj2(assignment(i)).frame);
             
             if a && b % in frame f the box was detected in both cameras
-                x_union = [obj1(i).X obj2(assignment(i)).X];
+                ff1 = find(obj1(i).frame==f);
+                ff2 = find(obj2(assignment(i)).frame==f);
+                x_union = [obj1(i).X(ff1,:) obj2(assignment(i)).X(ff2,:)];
                 x_min = min(x_union);
                 x_max = max(x_union);
-                new_objects(new_objects_count).X = [x_min x_max x_max x_min x_min x_max x_max x_min];
+                new_objects(new_objects_count).X(k,:) = [x_min x_max x_max x_min x_min x_max x_max x_min];
                 
-                y_union = [obj1(i).Y obj2(assignment(i)).Y];
+                y_union = [obj1(i).Y(ff1,:) obj2(assignment(i)).Y(ff2,:)];
                 y_min = min(y_union);
                 y_max = max(y_union);
-                new_objects(new_objects_count).Y = [y_min y_min y_max y_max y_min y_min y_max y_max];
+                new_objects(new_objects_count).Y(k,:) = [y_min y_min y_max y_max y_min y_min y_max y_max];
                 
-                z_union = [obj1(i).Z obj2(assignment(i)).Z];
+                z_union = [obj1(i).Z(ff1,:) obj2(assignment(i)).Z(ff2,:)];
                 z_min = min(z_union);
                 z_max = max(z_union);
-                new_objects(new_objects_count).Z = [z_min z_min z_min z_min z_max z_max z_max z_max];
+                new_objects(new_objects_count).Z(k,:) = [z_min z_min z_min z_min z_max z_max z_max z_max];
                 
             elseif a % in frame f the box was detected in cam1 only
-                new_objects(new_objects_count).X = obj1(i).X;
-                new_objects(new_objects_count).Y = obj1(i).Y;
-                new_objects(new_objects_count).Z = obj1(i).Z;
+                ff1 = find(obj1(i).frame==f);
+                new_objects(new_objects_count).X(k,:) = obj1(i).X(ff1,:);
+                new_objects(new_objects_count).Y(k,:) = obj1(i).Y(ff1,:);
+                new_objects(new_objects_count).Z(k,:) = obj1(i).Z(ff1,:);
             elseif b % in frame f the box was detected in cam2 only
-                new_objects(new_objects_count).X = obj2(assignment(i)).X;
-                new_objects(new_objects_count).Y = obj2(assignment(i)).Y;
-                new_objects(new_objects_count).Z = obj2(assignment(i)).Z;
+                ff2 = find(obj2(assignment(i)).frame==f);
+                new_objects(new_objects_count).X(k,:) = obj2(assignment(i)).X(ff2,:);
+                new_objects(new_objects_count).Y(k,:) = obj2(assignment(i)).Y(ff2,:);
+                new_objects(new_objects_count).Z(k,:) = obj2(assignment(i)).Z(ff2,:);
             end
         end
 
