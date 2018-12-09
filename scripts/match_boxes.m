@@ -1,204 +1,143 @@
-function [ objects ] = match_boxes( obj1, obj2, n_frames )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+function [ new_objects ] = match_boxes( obj1, obj2, new_objects, frame)
 
-% 1 - ratio -> intersection ratio
+% Matching between 3D boxes identified in two cameras:
+% 1) for every (box_cam1, box_cam2) pair, compute the intersection ratio
+% 2) use the hungarian algorithm to find the best match for every box
+% 3) eliminate matches whose score is below a sastisfiability threshold 
+%    (i.e. assume that the box is only seen by one of the cameras in the 
+%     current frame)
+% 4) if the match is good enough merge the frame list of the box in camera1
+%    with the frame list of the box in camera2 and save it in a new_object 
+% 5) 
+
+% (1 - intersection ratio)
 ratio_threshold = 0.7;
-
-new_objects = struct( 'frame',cell(1,1), ...
-                                   'X',cell(1,1), ...
-                                   'Y',cell(1,1), ... 
-                                   'Z',cell(1,1));
-
 new_objects_count = 0;
-ratio = zeros(length(obj1),length(obj2));
-% matching between obj1 and obj3
-for frame=1:n_frames
-    for i=1:length(obj1)
-        %check whether object is in frame
-        if ~ismember(frame,obj1(i).frame)
+obj1_to_remove = [];
+obj2_to_remove = [];
+
+% matrix with the ratio of volume intersection between every pair of components
+ratio = zeros(length(obj1),length(obj2)); 
+    
+for i=1:length(obj1) % iterate camera 1 components
+
+    % check whether component i of cam1 is in frame
+    if ~ismember(frame,obj1(i).frame)
+        ratio(i,:) = 1;
+        continue
+    end
+
+    % index of this frame in the frames list of the component i
+    ii = find(obj1(i).frame==frame);
+
+    % find component box vertices
+    x_min = min(obj1(i).X(ii,:)); x_max = max(obj1(i).X(ii,:));
+    y_min = min(obj1(i).Y(ii,:)); y_max = max(obj1(i).Y(ii,:));
+    z_min = min(obj1(i).Z(ii,:)); z_max = max(obj1(i).Z(ii,:));
+
+    box1 = [x_min x_max y_min y_max z_min z_max];
+
+    % compute component box volume
+    vol1 = prod(box1(:,2:2:end) - box1(:,1:2:end) ,2 );
+
+    for j=1:length(obj2) % iterate camera 2 components
+
+        % check whether component j  of cam2 is in frame
+        if ~ismember(frame,obj2(j).frame)
+            ratio(:,j) = 1;
+            continue
+        end 
+
+        % index of this frame in the frames list of the component j
+        jj = find(obj2(j).frame==frame);
+
+        % find component box vertices
+        x_min = min(obj2(j).X(jj,:)); x_max = max(obj2(j).X(jj,:));
+        y_min = min(obj2(j).Y(jj,:)); y_max = max(obj2(j).Y(jj,:));
+        z_min = min(obj2(j).Z(jj,:)); z_max = max(obj2(j).Z(jj,:));
+
+        box2 = [x_min x_max y_min y_max z_min z_max];
+
+        % compute component box volume
+        vol2 = prod(box2(:,2:2:end) - box2(:,1:2:end) ,2 );
+
+        % get the box created by the intersection of box1 and box2
+        common_box = intersectBoxes3d(box1, box2);
+
+        % if there is no intersection skip to next cam2 component
+        if common_box == -1
             continue
         end
-        
-        % obj1_frame_index
-        ii = find(obj1(i).frame==frame);
-        
-        box1 = [min(obj1(i).X(ii,:)) max(obj1(i).X(ii,:)) min(obj1(i).Y(ii,:)) max(obj1(i).Y(ii,:)) min(obj1(i).Z(ii,:)) max(obj1(i).Z(ii,:))];
-        % volume
-        vol1 = prod(box1(:,2:2:end) - box1(:,1:2:end) ,2 );
-        for j=1:length(obj2)
-           %check whether object is in frame
-            if ~ismember(frame,obj2(j).frame)
-                continue
-            end 
-            
-            % obj2_frame_index
-            jj = find(obj2(i).frame==frame);
-            
-            box2 = [min(obj2(j).X(jj,:)) max(obj2(j).X(jj,:)) min(obj2(j).Y(jj,:)) max(obj2(j).Y(jj,:)) min(obj2(j).Z(jj,:)) max(obj2(j).Z(jj,:))];
-            % volume
-            vol2 = prod(box2(:,2:2:end) - box2(:,1:2:end) ,2 );
-            
-            common_box = intersectBoxes3d(box1, box2);
-            if common_box == -1
-                continue
-            end
-            % volume
-            vol_c = prod(common_box(:,2:2:end) - common_box(:,1:2:end) ,2 );
-            
-            ratio(i,j) = 1 - (vol_c / (min(vol1, vol2)));
-            
-        end
-        
+
+        % compute volume of the common box
+        vol_c = prod(common_box(:,2:2:end) - common_box(:,1:2:end) ,2 );
+
+        % save the ratio between the volumes of the common_box and the
+        % smallest of the two component boxes;
+        ratio(i,j) = 1 - (vol_c / (min(vol1, vol2)));
+
     end
-    % Hungarian algorithm to find the best component assigment
-    assignment = munkres(ratio);
-    
-    for i=1:length(assignment)
-       
-        
-        % if the component in the first frame doesn't belong to a component
-        % in the next frame (associated to a low cost value)
-        if (assignment(i) == 0 || ratio(i,assignment(i)) > ratio_threshold)
-            continue
-        else
-            new_objects_count = new_objects_count + 1;
-            new_objects(new_objects_count).frame = union(obj1(i).frame, obj2(assignement(i)).frame);
-            
-            for k=1:length(new_objects(new_objects_count).frame)
-                
-            end
-            new_objects(new_objects_count).X = frame_components_old(i).X;
-            new_objects(new_objects_count).Y = frame_components_old(i).Y;
-            new_objects(new_objects_count).Z = frame_components_old(i).Z;
-        end
-    end
-    
 end
 
-
-%% pseudo code
+% Once we've computed the intersection ratios between each pair of
+% components detected by the cameras in the current frame, 
+% the Hungarian algorithm is used to find the best matches
+assignment = munkres(ratio);
     
-    k=0;
-    loop frame
-    
-        loop i in obj1
+for i=1:length(assignment)
 
-            check if i in frame (if not, ratio = 1)
-
-            loop j in obj2
+    % if the assignment is not good enough we consider that in this frame, 
+    % the component is only present in one of the cameras
+    if (assignment(i) == 0 || ratio(i,assignment(i)) > ratio_threshold)
+        continue
+    % a good match between components of the two cameras was found
+    else
+        new_objects_count = new_objects_count + 1;
+        obj1_to_remove = [obj1_to_remove i];
+        obj2_to_remove = [obj2_to_remove assignment(i)];
+        % frames will have all the frames where the box appears,
+        % independently of the camera that sees the box
+        new_objects(new_objects_count).frame = union(obj1(i).frame, obj2(assignment(i)).frame);
+        
+        % iterate all the frames of the new object and create the
+        % respective (X Y Z)
+        for f=1:length(new_objects(new_objects_count).frame)
+            a = ismember(f,obj1(i).frame);
+            b = ismember(f,obj2(assignment(i)).frame);
             
-                check if j in frame (if not, ratio = 1)
+            if a && b % in frame f the box was detected in both cameras
+                x_union = [obj1(i).X obj2(assignment(i)).X];
+                x_min = min(x_union);
+                x_max = max(x_union);
+                new_objects(new_objects_count).X = [x_min x_max x_max x_min x_min x_max x_max x_min];
                 
-                calc ratio(i,j)
+                y_union = [obj1(i).Y obj2(assignment(i)).Y];
+                y_min = min(y_union);
+                y_max = max(y_union);
+                new_objects(new_objects_count).Y = [y_min y_min y_max y_max y_min y_min y_max y_max];
                 
-        assignement = munkres(ratio(:,:));
-        
-        loop h in assignment
-        
-            check assignement < threshold
+                z_union = [obj1(i).Z obj2(assignment(i)).Z];
+                z_min = min(z_union);
+                z_max = max(z_union);
+                new_objects(new_objects_count).Z = [z_min z_min z_min z_min z_max z_max z_max z_max];
                 
-                k++
-                new_objects(k).frame = union(frames1, frames2);
-                
-                loop l in new_objects(k).frame
-                    
-                    boolean one is l in obj1.frame
-                    boolean two is l in obj2.frame
-                    
-                    if one and two
-                        
-                        new_objects(k).coords = mergeboxes(obj1, obj2) with respetive indexes
-                        
-                            
-                    elif one
-                        
-                        new_objects(k).coords = box(obj1) with respetive indexes
-                        
-                    else
-                         
-                        new_objects(k).coords = box(obj2) with respetive indexes
-                        
-             remove matched objects h from obj1, assignment(h) from obj2
-                        
-                    
-                        
-                    
-                
-        
+            elseif a % in frame f the box was detected in cam1 only
+                new_objects(new_objects_count).X = obj1(i).X;
+                new_objects(new_objects_count).Y = obj1(i).Y;
+                new_objects(new_objects_count).Z = obj1(i).Z;
+            elseif b % in frame f the box was detected in cam2 only
+                new_objects(new_objects_count).X = obj2(assignment(i)).X;
+                new_objects(new_objects_count).Y = obj2(assignment(i)).Y;
+                new_objects(new_objects_count).Z = obj2(assignment(i)).Z;
+            end
+        end
 
+    end
+end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%% draw boxes
-% for frame = 1:20
-%     figure (frame)
-%     xlabel('x');
-%     ylabel('y');
-%     zlabel('z');
-%     for i=1:length(obj1)
-%         if ~ismember(frame,obj1(i).frame)
-%             continue
-%         end
-%         frame_index = find(obj1(i).frame==frame);
-%         
-%         hold on
-%         line([obj1(i).X(frame_index,1) obj1(i).X(frame_index,2)],[obj1(i).Y(frame_index,1) obj1(i).Y(frame_index,1)],[obj1(i).Z(frame_index,1) obj1(i).Z(frame_index,1)]);
-%         line([obj1(i).X(frame_index,1) obj1(i).X(frame_index,2)],[obj1(i).Y(frame_index,1) obj1(i).Y(frame_index,1)],[obj1(i).Z(frame_index,5) obj1(i).Z(frame_index,5)]);
-%         line([obj1(i).X(frame_index,1) obj1(i).X(frame_index,2)],[obj1(i).Y(frame_index,3) obj1(i).Y(frame_index,3)],[obj1(i).Z(frame_index,1) obj1(i).Z(frame_index,1)]);
-%         line([obj1(i).X(frame_index,1) obj1(i).X(frame_index,2)],[obj1(i).Y(frame_index,3) obj1(i).Y(frame_index,3)],[obj1(i).Z(frame_index,5) obj1(i).Z(frame_index,5)]);
-% 
-%         line([obj1(i).X(frame_index,1) obj1(i).X(frame_index,1)],[obj1(i).Y(frame_index,1) obj1(i).Y(frame_index,3)],[obj1(i).Z(frame_index,1) obj1(i).Z(frame_index,1)]);
-%         line([obj1(i).X(frame_index,1) obj1(i).X(frame_index,1)],[obj1(i).Y(frame_index,1) obj1(i).Y(frame_index,3)],[obj1(i).Z(frame_index,5) obj1(i).Z(frame_index,5)]);
-%         line([obj1(i).X(frame_index,2) obj1(i).X(frame_index,2)],[obj1(i).Y(frame_index,1) obj1(i).Y(frame_index,3)],[obj1(i).Z(frame_index,1) obj1(i).Z(frame_index,1)]);
-%         line([obj1(i).X(frame_index,2) obj1(i).X(frame_index,2)],[obj1(i).Y(frame_index,1) obj1(i).Y(frame_index,3)],[obj1(i).Z(frame_index,5) obj1(i).Z(frame_index,5)]);
-% 
-%         line([obj1(i).X(frame_index,1) obj1(i).X(frame_index,1)],[obj1(i).Y(frame_index,1) obj1(i).Y(frame_index,1)],[obj1(i).Z(frame_index,1) obj1(i).Z(frame_index,5)]);
-%         line([obj1(i).X(frame_index,1) obj1(i).X(frame_index,1)],[obj1(i).Y(frame_index,3) obj1(i).Y(frame_index,3)],[obj1(i).Z(frame_index,1) obj1(i).Z(frame_index,5)]);
-%         line([obj1(i).X(frame_index,2) obj1(i).X(frame_index,2)],[obj1(i).Y(frame_index,1) obj1(i).Y(frame_index,1)],[obj1(i).Z(frame_index,1) obj1(i).Z(frame_index,5)]);
-%         line([obj1(i).X(frame_index,2) obj1(i).X(frame_index,2)],[obj1(i).Y(frame_index,3) obj1(i).Y(frame_index,3)],[obj1(i).Z(frame_index,1) obj1(i).Z(frame_index,5)]);
-%         
-%     end
-%     
-%     
-%     for i=1:length(obj3)
-%         if ~ismember(frame,obj3(i).frame)
-%             continue
-%         end
-%         frame_index = find(obj3(i).frame==frame);
-%         
-%         hold on
-%         line([obj3(i).X(frame_index,1) obj3(i).X(frame_index,2)],[obj3(i).Y(frame_index,1) obj3(i).Y(frame_index,1)],[obj3(i).Z(frame_index,1) obj3(i).Z(frame_index,1)],'Color','red');
-%         line([obj3(i).X(frame_index,1) obj3(i).X(frame_index,2)],[obj3(i).Y(frame_index,1) obj3(i).Y(frame_index,1)],[obj3(i).Z(frame_index,5) obj3(i).Z(frame_index,5)],'Color','red');
-%         line([obj3(i).X(frame_index,1) obj3(i).X(frame_index,2)],[obj3(i).Y(frame_index,3) obj3(i).Y(frame_index,3)],[obj3(i).Z(frame_index,1) obj3(i).Z(frame_index,1)],'Color','red');
-%         line([obj3(i).X(frame_index,1) obj3(i).X(frame_index,2)],[obj3(i).Y(frame_index,3) obj3(i).Y(frame_index,3)],[obj3(i).Z(frame_index,5) obj3(i).Z(frame_index,5)],'Color','red');
-% 
-%         line([obj3(i).X(frame_index,1) obj3(i).X(frame_index,1)],[obj3(i).Y(frame_index,1) obj3(i).Y(frame_index,3)],[obj3(i).Z(frame_index,1) obj3(i).Z(frame_index,1)],'Color','red');
-%         line([obj3(i).X(frame_index,1) obj3(i).X(frame_index,1)],[obj3(i).Y(frame_index,1) obj3(i).Y(frame_index,3)],[obj3(i).Z(frame_index,5) obj3(i).Z(frame_index,5)],'Color','red');
-%         line([obj3(i).X(frame_index,2) obj3(i).X(frame_index,2)],[obj3(i).Y(frame_index,1) obj3(i).Y(frame_index,3)],[obj3(i).Z(frame_index,1) obj3(i).Z(frame_index,1)],'Color','red');
-%         line([obj3(i).X(frame_index,2) obj3(i).X(frame_index,2)],[obj3(i).Y(frame_index,1) obj3(i).Y(frame_index,3)],[obj3(i).Z(frame_index,5) obj3(i).Z(frame_index,5)],'Color','red');
-% 
-%         line([obj3(i).X(frame_index,1) obj3(i).X(frame_index,1)],[obj3(i).Y(frame_index,1) obj3(i).Y(frame_index,1)],[obj3(i).Z(frame_index,1) obj3(i).Z(frame_index,5)],'Color','red');
-%         line([obj3(i).X(frame_index,1) obj3(i).X(frame_index,1)],[obj3(i).Y(frame_index,3) obj3(i).Y(frame_index,3)],[obj3(i).Z(frame_index,1) obj3(i).Z(frame_index,5)],'Color','red');
-%         line([obj3(i).X(frame_index,2) obj3(i).X(frame_index,2)],[obj3(i).Y(frame_index,1) obj3(i).Y(frame_index,1)],[obj3(i).Z(frame_index,1) obj3(i).Z(frame_index,5)],'Color','red');
-%         line([obj3(i).X(frame_index,2) obj3(i).X(frame_index,2)],[obj3(i).Y(frame_index,3) obj3(i).Y(frame_index,3)],[obj3(i).Z(frame_index,1) obj3(i).Z(frame_index,5)],'Color','red');
-%         
-%     end
-%     
-% end
+% remove assigned boxes from the initial objects
+obj1(obj1_to_remove) = [];
+obj2(obj2_to_remove) = [];
 
 end
 

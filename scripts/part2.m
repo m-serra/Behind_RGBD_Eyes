@@ -1,4 +1,5 @@
 %% Data Preprocessing
+close all
 
 datasetlocation = '../datasets/data_rgb_6/';
 cameralocation = '../vars/cameraparametersAsus.mat';
@@ -75,8 +76,10 @@ for frame=ransac_frames
     % check http://www.vlfeat.org/overview/sift.html for detais
     peak_thresh = 0;
     edge_thresh = 20;
-    [f_cam1, d_cam1] = vl_sift(single(grayseq_cam1(:,:,frame)),'PeakThresh', peak_thresh, 'edgethresh', edge_thresh);
-    [f_cam2, d_cam2] = vl_sift(single(grayseq_cam2(:,:,frame)),'PeakThresh', peak_thresh, 'edgethresh', edge_thresh);
+    [f_cam1, d_cam1] = vl_sift(single(grayseq_cam1(:,:,frame)),...
+                                'PeakThresh', peak_thresh, 'edgethresh', edge_thresh);
+    [f_cam2, d_cam2] = vl_sift(single(grayseq_cam2(:,:,frame)),...
+                                'PeakThresh', peak_thresh, 'edgethresh', edge_thresh);
     
     % 1.2) Match keypoints
     % we can apply a 1st filter at this stage to remove noisy matches from
@@ -115,7 +118,6 @@ P = 0.99;
 p = 0.5;
 k = 4;
 max_iter = round(log10(1-P) / log10(1-p^k));
-%max_iter = 200; % calculate according to the probability of outliers
 
 inliers = ransac_procrustes(matches_3D, max_iter);
 
@@ -131,41 +133,34 @@ diff = matches_3D(:,1:3) - predicted_cam1;
 error = sqrt(sum(diff.^2,2));
 total_wrong_matches = sum(double(error>0.25));
 
-%test point cloud
-pc1 = get_point_cloud(dseq_cam1(:,:,1), size_dimg, ...
-                    (1:size_dimg(1)*size_dimg(2)),cam_params);
-                
-figure(111);
-showPointCloud(pc1);
-                
-pc2 = get_point_cloud(dseq_cam2(:,:,1), size_dimg, ...
-                    (1:size_dimg(1)*size_dimg(2)),cam_params);
-                
-figure(222);
-showPointCloud(pc2);
-
-figure (334)
-points = pc2.Location*tr.T + ...
-                            repmat(tr.c(1,:),size(pc2.Location, 1),1);
-                        
-pc3 = pointCloud(points);
-showPointCloud(pc1);
-hold on
-showPointCloud(pc3);
-
-R = tr.T';
-T = tr.c(1,:)';
-
+% Stage 2: Run track3D_part1() for imagesequence_cam1 and imagesequence_cam2
 obj1 = track3D_part1(imagesequence_cam1, cam_params);
 obj2 = track3D_part1(imagesequence_cam2, cam_params);
 
-obj2_transformed = transform_object(obj2, R, T, n_frames);
 
-% Stage 2: Run track3D_part1() for imagesequence_cam1 and imagesequence_cam2
 
 % Stage 3: Represent components in 3D (point cloud), join possible
 % intersecting components. 
 % look for iterative closest points - wikipedia
+
+R = tr.T';
+T = tr.c(1,:)';
+obj2_transformed = transform_object(obj2, R, T, n_frames);
+new_objects = struct('frame',cell(1,1), 'X',cell(1,1), 'Y',cell(1,1), 'Z',cell(1,1));
+                 
+for frame = 1:n_frames
+    %test point cloud                    
+    figure (334)
+    color_point_cloud(dseq_cam1(:,:,frame), rgbseq_cam1(:,:,:,frame), cam_params, 'normal', cam_params.R, cam_params.T);  
+    hold on
+    color_point_cloud(dseq_cam2(:,:,frame), rgbseq_cam2(:,:,:,frame), cam_params, 'rotate', tr.T, tr.c(1,:));
+    plot_obj_boxes(obj1, frame, 'red', 1.0);
+    plot_obj_boxes(obj2_transformed, frame, 'blue', 1.0);
+    hold off
+    
+    new_objects = match_boxes( obj1, obj2_transformed, new_objects, frame);
+    plot_obj_boxes(new_objects, frame, 'green', 2.0);
+end
 
 
 % In the end return all identified components (identified only by cam1, only by cam2 and by both)
