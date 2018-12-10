@@ -17,7 +17,7 @@ obj1_to_remove = [];
 obj2_to_remove = [];
 
 % matrix with the ratio of volume intersection between every pair of components
-ratio = zeros(length(obj1),length(obj2)); 
+ratio = ones(length(obj1),length(obj2)); 
     
 for i=1:length(obj1) % iterate camera 1 components
 
@@ -38,7 +38,7 @@ for i=1:length(obj1) % iterate camera 1 components
     box1 = [x_min x_max y_min y_max z_min z_max];
 
     % compute component box volume
-    vol1 = prod(box1(:,2:2:end) - box1(:,1:2:end) ,2 );
+    vol1 = abs(prod(box1(:,2:2:end) - box1(:,1:2:end) ,2 ));
 
     for j=1:length(obj2) % iterate camera 2 components
 
@@ -59,13 +59,14 @@ for i=1:length(obj1) % iterate camera 1 components
         box2 = [x_min x_max y_min y_max z_min z_max];
 
         % compute component box volume
-        vol2 = prod(box2(:,2:2:end) - box2(:,1:2:end) ,2 );
+        vol2 = abs(prod(box2(:,2:2:end) - box2(:,1:2:end) ,2 ));
 
         % get the box created by the intersection of box1 and box2
         common_box = intersectBoxes3d(box1, box2);
 
         % if there is no intersection skip to next cam2 component
         if common_box == -1
+            ratio(i,j) = 1;
             continue
         end
 
