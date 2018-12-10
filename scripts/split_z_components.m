@@ -17,11 +17,10 @@ function cc = split_z_components(cc, d_img, d_threshold)
     n_components = cc.NumObjects;
     
     for c = n_components:-1:1
-               
+
         % obtain the component in depth values instead of 1s and 0s
-        d_component = d_img( cc_indx(c).SubarrayIdx{1}(1):cc_indx(c).SubarrayIdx{1}(end), ...
-                             cc_indx(c).SubarrayIdx{2}(1):cc_indx(c).SubarrayIdx{2}(end));
-        
+        d_component = d_img(cc_indx(c).SubarrayIdx{:});
+            
         component_size = numel(d_component);
         costs =zeros(1, 8 * component_size);
         ind1 = zeros(1, 8 * component_size);
@@ -91,19 +90,24 @@ function cc = split_z_components(cc, d_img, d_threshold)
 
         % find the connected components of the graph
         [S, C] = graphconncomp(graph);
-     
+          
+        % obtain the component in original pixel values
+        original_dimg_indxs = d_img_indx(cc_indx(c).SubarrayIdx{:});
         
-        % Finally update the components in cc
-        d_component_original_indx = d_img_indx(...
-                                     cc_indx(c).SubarrayIdx{1}(1):cc_indx(c).SubarrayIdx{1}(end), ...
-                                     cc_indx(c).SubarrayIdx{2}(1):cc_indx(c).SubarrayIdx{2}(end));
-        d_component_original_indx = d_component_original_indx(:);
+        % determine which pixels of the bounding box actually belong to the
+        % component and not to the zero padding of the box
+        a = ismember(original_dimg_indxs, cc.PixelIdxList{1,c});
+        original_dimg_indxs = original_dimg_indxs.*a; % open this to understand (If I forget)
+        original_dimg_indxs = original_dimg_indxs(:);
         
         if S > 1
             % Create a new entry in cc.PixelIdxList for each of the new components
             for s = 1:S
-                cc.PixelIdxList{cc.NumObjects+1} = d_component_original_indx(C==s);
-                cc.NumObjects = cc.NumObjects + 1;
+                a = nonzeros(original_dimg_indxs(C==s));
+                if ~isempty(a)
+                    cc.PixelIdxList{cc.NumObjects+1} = a;
+                    cc.NumObjects = cc.NumObjects + 1;
+                end  
             end
             
             % Delete the component that was split in several components

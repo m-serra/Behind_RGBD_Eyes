@@ -49,7 +49,7 @@ for frame=1:size(dseq,3)
                 rgbseq(:,:,:,frame), cc.PixelIdxList{i}, cam_params);
             %get box coordinates
             [X, Y, Z] = get_box(dseq(:,:,frame) ,cc.PixelIdxList{i},...
-                                cam_params, i);
+                                cam_params, frame);
             frame_components_new(i).X = X;
             frame_components_new(i).Y = Y;
             frame_components_new(i).Z = Z;
