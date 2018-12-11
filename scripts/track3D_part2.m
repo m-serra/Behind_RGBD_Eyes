@@ -53,12 +53,11 @@ for frame=1:size(dseq_cam1,3)
     frame_components_cam2 = get_component_info(cc_cam2, dseq_cam2(:,:,frame), ...
                         rgbseq_cam2(:,:,:,frame), cam_params, frame);
                     
-    %transform objects from cam2 into cam1 reference
+    % transform objects from cam2 into cam1 reference
     frame_components_cam2 = transform_object(frame_components_cam2, R, T, n_frames);
     
-    
+    % get the intersection of components from cam1 and cam2
     frame_components_new = registration( frame_components_cam1, frame_components_cam2, frame);
-    
     
     % compare frame_components's components
     % with previous frame components
