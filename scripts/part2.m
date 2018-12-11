@@ -25,8 +25,8 @@ imagesequence_cam2 = struct('rgb', cell(1, images_per_cam), 'depth', cell(1, ima
 
 for i = 1:images_per_cam
     % load camera 1 images
-    imagesequence_cam1(i).rgb =[datasetlocation rgb_images(i).name];
-    imagesequence_cam1(i).depth =[datasetlocation depth_images(i).name];
+    imagesequence_cam1(i).rgb =[datasetlocation rgb_images(images_per_cam + i).name];
+    imagesequence_cam1(i).depth =[datasetlocation depth_images(images_per_cam + i).name];
     % load camera 2 images
     imagesequence_cam2(i).rgb =[datasetlocation rgb_images(images_per_cam + i).name];
     imagesequence_cam2(i).depth =[datasetlocation depth_images(images_per_cam + i).name];

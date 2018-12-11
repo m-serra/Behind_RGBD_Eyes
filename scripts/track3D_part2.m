@@ -70,7 +70,7 @@ for frame=1:size(dseq_cam1,3)
     end
     %this will be inside a loop with frame iterator
     objects = [objects new_objects];
-    if frame == size(dseq,3) %last frame -> all old components become new_objects
+    if frame == size(dseq_cam1,3) %last frame -> all old components become new_objects
         [new_objects, ~] = match_components(frame_components_old, []);
         objects = [objects new_objects];
     end
