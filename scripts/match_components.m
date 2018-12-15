@@ -23,7 +23,7 @@ function [new_objects, frame_components_old] = match_components(frame_components
     assignment = munkres(C);
     
     % to define
-    threshold_hungarian = 0.2;
+    threshold_hungarian = 1.5;
     
     new_objects_count = 0;
     for i=1:length(assignment)

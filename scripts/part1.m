@@ -1,13 +1,13 @@
 %% Data Preprocessing
 
-datasetlocation = '../datasets/maizena_chocapics2/';
+datasetlocation = '../datasets/um/';
 
 cameralocation = '../vars/cameraparametersAsus.mat';
 
 
 % CREATE image sequence
 % Get the list of images names
-rgb_images = dir(strcat(datasetlocation, '*.png'));
+rgb_images = dir(strcat(datasetlocation, '*.jpg'));
 depth_images = dir(strcat(datasetlocation, '*.mat'));
 
 % Check for datasets with errors
