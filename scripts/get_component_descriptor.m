@@ -29,9 +29,11 @@ function [ descriptor ] = get_component_descriptor( dimg, rgbimg, indices, cam_p
     component_rgb(indsclean,:)=rgb_img_aux(indscolor,:)/255;
     component_hsv = rgb2hsv(component_rgb);
     h_histogram = histcounts(component_hsv(:,1),10);
-    s_histogram = histcounts(component_hsv(:,2),10);
+    
+    %only h histogram needed
+    %s_histogram = histcounts(component_hsv(:,2),10);
 
-    descriptor{2} = [h_histogram; s_histogram];
+    descriptor{2} = h_histogram;
     
 %     pc=pointCloud(P', 'color',uint8(component_rgb*255));
 %     figure(7); showPointCloud(pc);
