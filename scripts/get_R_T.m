@@ -33,7 +33,7 @@ for frame=ransac_frames
     matches = round([f_cam1(1:2,matches(1,:))' f_cam2(1:2,matches(2,:))']);
     
     % plotting
-    % plot_sift(grayseq_cam1(:,:,frame),grayseq_cam2(:,:,frame), matches);
+    plot_sift(grayseq_cam1(:,:,frame),grayseq_cam2(:,:,frame), matches);
     
     % Convert points in 3D coordinates in the corresponding frame
     u_cam1_rgb = matches(:,1); v_cam1_rgb = matches(:,2);
@@ -43,6 +43,10 @@ for frame=ransac_frames
     cam2_3D = rgb_to_xyz([u_cam2_rgb v_cam2_rgb], dseq_cam2(:,:,frame),cam_params);
         
     matches_3D = [matches_3D; [cam1_3D' cam2_3D']]; 
+    
+    if size(matches_3D,1) > 25
+        break
+    end
     
 end
 
