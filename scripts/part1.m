@@ -1,13 +1,13 @@
 %% Data Preprocessing
 
-datasetlocation = '../datasets/um/';
+datasetlocation = '../datasets/maizena_chocapics1/';
 
 cameralocation = '../vars/cameraparametersAsus.mat';
 
 
 % CREATE image sequence
 % Get the list of images names
-rgb_images = dir(strcat(datasetlocation, '*.jpg'));
+rgb_images = dir(strcat(datasetlocation, '*.png'));
 depth_images = dir(strcat(datasetlocation, '*.mat'));
 
 % Check for datasets with errors
@@ -36,6 +36,3 @@ cameramatrix = load(cameralocation);
 
 % Calling the function of PART1
 objects = track3D_part1(imagesequence, cameramatrix.cam_params);
-
-%% Part II
-

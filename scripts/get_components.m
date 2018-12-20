@@ -47,7 +47,7 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
 %      end
 %      
     % Remove components that are smaller than a number of pixels
-    min_component_size = 300; % PASSAR COMO PARAMETRO 
+    min_component_size = 800; % PASSAR COMO PARAMETRO 
     initial_NumObjects = cc.NumObjects;
     for i = initial_NumObjects:-1:1
         if(length(cc.PixelIdxList{i}) < min_component_size)

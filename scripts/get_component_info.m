@@ -24,7 +24,6 @@ function [ frame_components_new ] = get_component_info( cc, dimg, rgbimg, cam_pa
             frame_components_new(i).Y = Y;
             frame_components_new(i).Z = Z;
         end
-        
     else
         frame_components_new = struct( 'frame',cell(1,cc.NumObjects), ...
                                    'label',cell(1,cc.NumObjects), ...

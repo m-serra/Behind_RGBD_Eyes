@@ -26,37 +26,13 @@ Z = [pc.ZLimits(1) pc.ZLimits(1) pc.ZLimits(1) pc.ZLimits(1) ...
      pc.ZLimits(2) pc.ZLimits(2) pc.ZLimits(2) pc.ZLimits(2)];
  
 
-figure(10 + i);
-showPointCloud(pc);
-title(strcat('Frame ', int2str(i) ));
-%xlim([0 2.5]);
-%ylim([-0.2 1.2]);
-%zlim([2 5]);
-xlabel('x');
-ylabel('y');
-zlabel('z');
-hold on
-line([X(1) X(2)],[Y(1) Y(1)],[Z(1) Z(1)]);
-line([X(1) X(2)],[Y(1) Y(1)],[Z(5) Z(5)]);
-line([X(1) X(2)],[Y(3) Y(3)],[Z(1) Z(1)]);
-line([X(1) X(2)],[Y(3) Y(3)],[Z(5) Z(5)]);
-
-line([X(1) X(1)],[Y(1) Y(3)],[Z(1) Z(1)]);
-line([X(1) X(1)],[Y(1) Y(3)],[Z(5) Z(5)]);
-line([X(2) X(2)],[Y(1) Y(3)],[Z(1) Z(1)]);
-line([X(2) X(2)],[Y(1) Y(3)],[Z(5) Z(5)]);
-
-line([X(1) X(1)],[Y(1) Y(1)],[Z(1) Z(5)]);
-line([X(1) X(1)],[Y(3) Y(3)],[Z(1) Z(5)]);
-line([X(2) X(2)],[Y(1) Y(1)],[Z(1) Z(5)]);
-line([X(2) X(2)],[Y(3) Y(3)],[Z(1) Z(5)]);
-
-% figure (10 + i)
+% %uncomment to draw component point cloud + box
+% figure(10 + i);
 % showPointCloud(pc);
-% title(strcat('Component ', int2str(i) ));
-% xlim([0 2.5]);
-% ylim([-0.2 1.2]);
-% zlim([2 5]);
+% title(strcat('Frame ', int2str(i) ));
+% %xlim([0 2.5]);
+% %ylim([-0.2 1.2]);
+% %zlim([2 5]);
 % xlabel('x');
 % ylabel('y');
 % zlabel('z');
@@ -76,13 +52,6 @@ line([X(2) X(2)],[Y(3) Y(3)],[Z(1) Z(5)]);
 % line([X(2) X(2)],[Y(1) Y(1)],[Z(1) Z(5)]);
 % line([X(2) X(2)],[Y(3) Y(3)],[Z(1) Z(5)]);
 
-% edges = [pc.XLimits(2) - pc.XLimits(1), pc.YLimits(2) - pc.YLimits(1),...
-%          pc.ZLimits(2) - pc.ZLimits(1)]; % size of each edge
-% origin = [pc.XLimits(1), pc.YLimits(1), pc.ZLimits(1)]; % defined as the point from which the cube 
-% will be drawn
-% transparency = 0.1;
-% plot_box(edges, origin, transparency)
-% hold off 
 
 end
 

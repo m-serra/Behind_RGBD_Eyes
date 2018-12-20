@@ -59,6 +59,19 @@ for frame=1:size(dseq_cam1,3)
     % get the intersection of components from cam1 and cam2
     frame_components_new = registration( frame_components_cam1, frame_components_cam2, frame);
     
+    
+%     % debug mode - experimental results (color point cloud)
+%     if length(frame_components_new) > 0
+%         % colour point clouds
+%         figure (200 + frame)
+%         color_point_cloud(dseq_cam2(:,:,frame), rgbseq_cam2(:,:,:,frame), cam_params, 'rotate',R',T')
+%         hold on
+%         color_point_cloud(dseq_cam1(:,:,frame), rgbseq_cam1(:,:,:,frame), cam_params, 'normal',0,0)
+%         for obj=1:length(frame_components_new)
+%            plot_obj_boxes(frame_components_new(obj), frame, char(color_(obj)), 3); 
+%         end
+%     end
+    
     % compare frame_components's components
     % with previous frame components
     if frame == 1 %first frame -> no old components

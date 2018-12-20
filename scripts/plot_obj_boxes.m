@@ -13,7 +13,7 @@ function plot_obj_boxes(obj, frame, color, width)
         z_min = min(obj(i).Z(frame_index,:));
         z_max = max(obj(i).Z(frame_index,:));
         
-        figure(334);
+        %figure(334);
         %figure (30 + obj(i).frame(frame))
         %title(strcat('Frame ', int2str(obj(i).frame(frame))));
         xlabel('x');

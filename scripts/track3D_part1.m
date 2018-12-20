@@ -35,6 +35,18 @@ for frame=1:size(dseq,3)
                         rgbseq(:,:,:,frame), cam_params, frame);
     
     
+                    
+%     % debug mode - experimental results (color point cloud)
+%     if length(frame_components_new) > 0
+%         % colour point clouds
+%         figure (200 + frame)
+%         title(strcat('Frame ', int2str(frame) ));
+%         color_point_cloud(dseq(:,:,frame), rgbseq(:,:,:,frame), cam_params, 'normal',0,0)
+%         for obj=1:length(frame_components_new)
+%            plot_obj_boxes(frame_components_new(obj), frame, char(color_(obj)), 3); 
+%         end
+%     end
+    
     % compare frame_components's components
     % with previous frame components
     if frame == 1 %first frame -> no old components
