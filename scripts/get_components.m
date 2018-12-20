@@ -37,9 +37,9 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
      
     % MAYBE WE SHOULD SUBSAMPLE HERE TO IMPROVE PERFORMANCE
     % Split different components that might be identified as one                 
-     tic
+     %tic
      cc = split_z_components(cc, img, 0.2);
-     toc
+     %toc
     
 %      for i = 1:cc.NumObjects
 %          figure(20+i);
@@ -73,8 +73,8 @@ function [cc] = get_components( background, img, diff_threshold, filter_size, rg
 %     
 %     Different components are assgined different colors
 
-     figure(5);
-     imagesc(bwlabel(imgdiffiltered));
-     title('Connected components');
+     % figure(5);
+     % imagesc(bwlabel(imgdiffiltered));
+     % title('Connected components');
      
 end

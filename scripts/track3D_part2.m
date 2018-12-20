@@ -1,4 +1,4 @@
-function [ objects ] = track3D_part2( imagesequence_cam1, imagesequence_cam2, cam_params )
+function [ objects, cam2toW ] = track3D_part2( imagesequence_cam1, imagesequence_cam2, cam_params )
 % Part II
 
 % In this section we will identify moving objects not just with one camera 
@@ -92,6 +92,8 @@ end
 % take from the objects structure the components that only appear in one
 % frame (according to the professor, those components are not meaningful)
 objects = clean_single_objects(objects);
+
+cam2toW = struct('R',R,'T',T);
 
 end
 
