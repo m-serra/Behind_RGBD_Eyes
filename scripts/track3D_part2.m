@@ -21,7 +21,7 @@ n_frames = size(dseq_cam1,3); % number of frames in sequence
 size_dimg = size(dseq_cam1(:,:,1)); % stores size of dimg
 
 % Stage 1: Identify R, T from cam2 to cam1 referential
-ransac_frames = 20;
+ransac_frames = [1:20];
 [R, T] = get_R_T(grayseq_cam1, grayseq_cam2, dseq_cam1, dseq_cam2, cam_params, ransac_frames);
 
 % Subtract background
@@ -60,20 +60,20 @@ for frame=1:size(dseq_cam1,3)
     frame_components_new = registration( frame_components_cam1, frame_components_cam2, frame);
     
     
-    % debug mode - experimental results (color point cloud)
-    if length(frame_components_new) > 0
-        % colour point clouds
-        figure (200 + frame)
-        color_point_cloud(dseq_cam2(:,:,frame), rgbseq_cam2(:,:,:,frame), cam_params, 'rotate',R',T')
-        hold on
-        color_point_cloud(dseq_cam1(:,:,frame), rgbseq_cam1(:,:,:,frame), cam_params, 'normal',0,0)
-        for obj=1:length(frame_components_new)
-            if obj>8
-                continue
-            end
-           plot_obj_boxes(frame_components_new(obj), frame, char(color_(obj)), 3); 
-        end
-    end
+%     % debug mode - experimental results (color point cloud)
+%     if length(frame_components_new) > 0
+%         % colour point clouds
+%         figure (200 + frame)
+%         color_point_cloud(dseq_cam2(:,:,frame), rgbseq_cam2(:,:,:,frame), cam_params, 'rotate',R',T')
+%         hold on
+%         color_point_cloud(dseq_cam1(:,:,frame), rgbseq_cam1(:,:,:,frame), cam_params, 'normal',0,0)
+%         for obj=1:length(frame_components_new)
+%             if obj>8
+%                 continue
+%             end
+%            plot_obj_boxes(frame_components_new(obj), frame, char(color_(obj)), 3); 
+%         end
+%     end
     
     % compare frame_components's components
     % with previous frame components

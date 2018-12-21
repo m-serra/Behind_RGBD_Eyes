@@ -26,8 +26,6 @@ function color_point_cloud(dimg, rgb_img, cam_params, mode, R, T)
     
     % If you are really a MATLAB Pro(fessional) you can figure out a faster
     % way!
-
-    fprintf('Fast mode %g seconds \n',toc);
     
     
     if(mode == 'rotate')
