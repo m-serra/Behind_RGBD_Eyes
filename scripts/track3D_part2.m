@@ -98,5 +98,10 @@ objects = clean_single_objects(objects);
 
 cam2toW = struct('R',R,'T',T);
 
+for object=1:size(objects,2)
+    objects(object).frames_tracked = objects(object).frame;
+end
+objects = rmfield(objects,'frame');
+
 end
 

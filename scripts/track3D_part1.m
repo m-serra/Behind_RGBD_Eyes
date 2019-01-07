@@ -68,4 +68,9 @@ end
 % frame (according to the professor, those components are not meaningful)
 objects = clean_single_objects(objects);
 
+for object=1:size(objects,2)
+    objects(object).frames_tracked = objects(object).frame;
+end
+objects = rmfield(objects,'frame');
+
 end
