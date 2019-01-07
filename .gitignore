@@ -2,3 +2,9 @@
 datasets/*
 *.m~
 \.DS_Store
+
+test/pivprojects/putuyourcodehere/
+
+test/pivprojects/
+
+submission/
